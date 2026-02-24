@@ -383,7 +383,7 @@ function renderSession(){
     const exData=encodeURIComponent(JSON.stringify(ex));
     return `<div style="background:${entry?"linear-gradient(135deg,rgba(107,229,61,0.12),rgba(14,184,160,0.12))":"#fff"};border:1.5px solid ${entry?"rgba(14,184,160,0.35)":"#eee"};border-radius:16px;padding:14px 16px;margin-bottom:10px;box-shadow:${entry?T.glowSm:""}">
       <div style="display:flex;justify-content:space-between;align-items:center">
-        <div style="flex:1" onclick="openLog('${key}',${i})">>
+        <div style="flex:1" onclick="openLog('${key}',${i})">
           <div style="font-size:15px;font-weight:700;color:${T.dark}">${ex.name}</div>
           <div style="font-size:12px;color:#888;margin-top:2px">${ex.range}</div>
           ${statusLine}
