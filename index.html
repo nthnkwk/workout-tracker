@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="apple-touch-icon.png" />
   <title>Workout Tracker</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; background: #fff; max-width: 430px; margin: 0 auto; min-height: 100vh; }
     input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
     .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 100; display: flex; align-items: flex-end; }
@@ -383,14 +383,14 @@ function renderSession(){
     const exData=encodeURIComponent(JSON.stringify(ex));
     return `<div style="background:${entry?"linear-gradient(135deg,rgba(107,229,61,0.12),rgba(14,184,160,0.12))":"#fff"};border:1.5px solid ${entry?"rgba(14,184,160,0.35)":"#eee"};border-radius:16px;padding:14px 16px;margin-bottom:10px;box-shadow:${entry?T.glowSm:""}">
       <div style="display:flex;justify-content:space-between;align-items:center">
-        <div style="flex:1" onclick="openLog('${key}',${i})">
+        <div style="flex:1" onclick="openLog('${key}',${i})">>
           <div style="font-size:15px;font-weight:700;color:${T.dark}">${ex.name}</div>
           <div style="font-size:12px;color:#888;margin-top:2px">${ex.range}</div>
           ${statusLine}
         </div>
         <div style="display:flex;align-items:center;gap:8px">
-          <button onclick="openTips('${exData}')" style="background:linear-gradient(135deg,rgba(107,229,61,0.12),rgba(14,184,160,0.12));border:1px solid rgba(14,184,160,0.2);border-radius:10px;width:34px;height:34px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center">💡</button>
-          <div onclick="openLog('${key}',${i})" style="width:32px;height:32px;border-radius:50%;background:${entry?T.grad:"#f0f0f0"};display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:${entry?"#fff":"#ccc"};box-shadow:${entry?T.glowSm:""};font-weight:800">${entry?"✓":"+"}</div>
+          <button onclick="openTips('${ex.id}')" style="background:linear-gradient(135deg,rgba(107,229,61,0.12),rgba(14,184,160,0.12));border:1px solid rgba(14,184,160,0.2);border-radius:10px;width:34px;height:34px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center">💡</button>
+          <div onclick="toggleExercise('${key}',${i})" style="width:32px;height:32px;border-radius:50%;background:${entry?T.grad:"#f0f0f0"};display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:${entry?"#fff":"#ccc"};box-shadow:${entry?T.glowSm:""};font-weight:800">${entry?"✓":"+"}</div>
         </div>
       </div>
     </div>`;
@@ -527,7 +527,7 @@ function renderLogSheet(){
           <div style="font-size:18px;font-weight:700;color:${T.dark}">${ex.name}</div>
           <div style="font-size:13px;color:#888;margin-top:2px">${ex.range} · Last: ${isBW?`BW×${last.r}`:`${last.w}kg×${last.r}`}${isDeload()?`<span style="color:#f59e0b;font-weight:700"> · 🔄 80%</span>`:""}</div>
         </div>
-        <button onclick="closeLog();openTips('${exData}')" style="background:linear-gradient(135deg,rgba(107,229,61,0.12),rgba(14,184,160,0.12));border:1.5px solid rgba(14,184,160,0.25);border-radius:10px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;color:${T.accent};font-family:inherit">💡 Tips</button>
+        <button onclick="closeLog();openTips('${ex.id}')" style="background:linear-gradient(135deg,rgba(107,229,61,0.12),rgba(14,184,160,0.12));border:1.5px solid rgba(14,184,160,0.25);border-radius:10px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;color:${T.accent};font-family:inherit">💡 Tips</button>
       </div>
       ${deloadNote}${weightRow}
       <div style="margin-bottom:28px">
@@ -589,6 +589,18 @@ function setWeek(w){ persist(SK.week,w); setState({weekNum:w}); }
 function openDay(key){ setState({view:"session",activeDay:key}); }
 function finishSession(key){ const c={...state.completed,[key]:true}; persist(SK.completed,c); setState({completed:c,view:"home",activeDay:null}); }
 
+function toggleExercise(dayKey,exIdx){
+  const ex=DAYS[dayKey].exercises[exIdx];
+  const logs={...state.sessionLogs};
+  if(logs[ex.id]){
+    // undo — remove the log entry
+    delete logs[ex.id];
+    setState({sessionLogs:logs});
+  } else {
+    // not yet logged — open the log sheet
+    openLog(dayKey,exIdx);
+  }
+}
 function openLog(dayKey,exIdx){
   const ex=DAYS[dayKey].exercises[exIdx], pre=getPreFill(ex.id);
   const logs={...state.sessionLogs};
@@ -610,7 +622,10 @@ function saveLog(){
   if(entry){ const h={...state.history,[ex.id]:[...(state.history[ex.id]||[]),{w:Number(entry.w),r:Number(entry.r)}]}; persist(SK.history,h); setState({history:h,logSheet:null}); }
   else setState({logSheet:null});
 }
-function openTips(encoded){ const ex=JSON.parse(decodeURIComponent(encoded)); setState({tipsSheet:ex}); }
+function openTips(exId){
+  const ex=Object.values(DAYS).flatMap(d=>d.exercises).find(e=>e.id===exId);
+  if(ex) setState({tipsSheet:ex});
+}
 function closeTips(){ setState({tipsSheet:null}); }
 function toggleChart(id){ setState({chartEx:state.chartEx===id?null:id}); }
 function logBW(){ const v=parseFloat(document.getElementById("bw-input")?.value); if(!isNaN(v)&&v>0){ const bw=[...state.bodyweight,v]; persist(SK.bw,bw); setState({bodyweight:bw}); } }
