@@ -1,104 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="Workout" />
-  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
-  <title>Workout Tracker</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; background: #fff; max-width: 430px; margin: 0 auto; min-height: 100vh; }
-    input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
-    .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 100; display: flex; align-items: flex-end; }
-    .sheet { background: #fff; width: 100%; border-radius: 20px 20px 0 0; padding: 24px 20px 48px; max-height: 80vh; overflow-y: auto; }
-    .sheet-handle { width: 36px; height: 4px; background: #ddd; border-radius: 99px; margin: 0 auto 20px; }
-    .tab-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); border-top: 1px solid #eee; display: flex; padding: 10px 0 env(safe-area-inset-bottom, 16px); }
-    .tab-btn { flex: 1; background: none; border: none; cursor: pointer; padding: 6px 0; display: flex; flex-direction: column; align-items: center; gap: 2px; position: relative; }
-    .tab-badge { position: absolute; top: 4px; right: calc(50% - 18px); width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; }
-    .page { padding: 0 20px 110px; }
-    .page-header { padding-top: 56px; margin-bottom: 24px; }
-    .big-title { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
-    .subtitle { font-size: 14px; color: #666; margin-top: 4px; }
-    .section-label { font-size: 13px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
-    .card { border-radius: 18px; padding: 16px 18px; margin-bottom: 12px; }
-    .card-white { background: #fff; border: 1.5px solid #e5e5e5; }
-    .card-gray { background: #f8f8f8; }
-    .card-dark { background: #1a1a1a; color: #fff; }
-    .card-green { background: #f0fff4; border: 1.5px solid #86efac; }
-    .card-yellow { background: #fff3cd; border: 1px solid #f59e0b; }
-    .card-red { background: #fef2f2; border: 1px solid #fca5a5; }
-    .pill { border-radius: 99px; padding: 6px 14px; font-size: 12px; font-weight: 700; display: inline-block; }
-    .toggle { width: 44px; height: 26px; border-radius: 99px; cursor: pointer; position: relative; transition: background 0.2s; flex-shrink: 0; }
-    .toggle-knob { width: 20px; height: 20px; border-radius: 50%; background: #fff; position: absolute; top: 3px; transition: left 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-    .pbar-wrap { background: #f0f0f0; border-radius: 99px; height: 6px; overflow: hidden; }
-    .pbar-fill { height: 100%; border-radius: 99px; transition: width 0.4s; }
-    .stepper-row { display: flex; align-items: center; gap: 16px; }
-    .stepper-val { font-size: 32px; font-weight: 800; flex: 1; text-align: center; }
-    .btn { border: none; border-radius: 12px; padding: 12px 20px; font-size: 15px; font-weight: 700; cursor: pointer; min-width: 56px; display: flex; align-items: center; justify-content: center; }
-    .btn-dark { background: #1a1a1a; color: #fff; }
-    .btn-light { background: #f4f4f4; color: #333; }
-    .btn-full { width: 100%; border-radius: 14px; padding: 16px; font-size: 16px; }
-    .btn-ghost { width: 100%; padding: 12px; font-size: 14px; color: #888; background: none; border: none; cursor: pointer; margin-top: 8px; }
-    .exercise-row { border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
-    .tip-num { background: #1a1a1a; color: #fff; border-radius: 99px; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; flex-shrink: 0; margin-top: 1px; }
-    .week-dots { display: flex; gap: 6px; }
-    .week-dot { flex: 1; height: 8px; border-radius: 99px; cursor: pointer; }
-    .tag { font-size: 10px; border-radius: 6px; padding: 2px 7px; font-weight: 600; }
-    .deload-tag { background: #fff3cd; color: #92400e; }
-    .optional-tag { background: #f0f0f0; color: #888; }
-    .nut-icon-wrap { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
-    .check-circle { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: background 0.2s; flex-shrink: 0; }
-  </style>
-</head>
-<body>
-<div id="app"></div>
+import { useState, useEffect } from "react";
 
-<script>
-// ── DATA ────────────────────────────────────────────────────────────────────
+// ── THEME ────────────────────────────────────────────────────────────────────
+const T = {
+  grad: "linear-gradient(135deg, #6be53d 0%, #22c97a 45%, #0eb8a0 100%)",
+  gradSubtle: "linear-gradient(135deg, rgba(107,229,61,0.12) 0%, rgba(14,184,160,0.12) 100%)",
+  teal: "#0eb8a0",
+  green: "#6be53d",
+  mid: "#22c97a",
+  dark: "#0a3d35",       // deep dark teal for text accents
+  accent: "#0c6b5e",     // mid-dark teal for section labels
+  glow: "0 0 32px rgba(34,201,122,0.22), 0 4px 24px rgba(14,184,160,0.15)",
+  glowSm: "0 0 16px rgba(34,201,122,0.15)",
+};
 
+// ── DATA ─────────────────────────────────────────────────────────────────────
 const DAYS = {
-  A: {
-    label:"Day A", subtitle:"Upper Chest + Lats", exercises:[
-      {id:"incline_db",name:"Incline DB Press",range:"4×6–8",unit:"kg",tips:["Set bench to 30–45°. Higher = more shoulder, lower = more chest.","Dumbbells start at shoulder height, elbows at ~60° from torso (not flared out).","Press up and slightly together — don't lock out hard at top.","Control the descent for 2–3 sec. Feel the stretch at the bottom.","Stop 1–2 reps before form breaks — no ugly grinding."]},
-      {id:"pullups",name:"Pull-Ups",range:"4×5–8",unit:"BW",tips:["Dead hang start — full arm extension, shoulders packed down.","Drive elbows toward your back pockets, not just down.","Chin clears bar = full rep. Don't crane your neck up.","Lower slowly (2–3 sec) — the descent builds more muscle.","If stuck at low reps: use a band or do 3-sec negatives only."]},
-      {id:"cs_row",name:"Chest Supported Row",range:"3×8–10",unit:"kg",tips:["Lie chest-down on the incline pad — let your arms hang freely.","Row to your lower chest/upper stomach, not your chin.","Squeeze shoulder blades together at the top, hold 1 sec.","Elbows should travel at ~45° from body — not straight out.","Keep your chest pinned to the pad throughout. No heaving."]},
-      {id:"ohp",name:"Seated DB Shoulder Press",range:"3×8–10",unit:"kg",tips:["Sit upright with back support. Don't arch aggressively.","Start with DBs at ear height, palms facing forward.","Press straight up — DBs can touch lightly at top.","Don't lock out and rest — keep tension on the delts.","If shoulders feel cooked from yoga, drop weight 10–15% guilt-free."]},
-      {id:"cable_lat",name:"Cable Lateral Raise",range:"4×12–15",unit:"kg",tips:["Cable pulled across the body gives better tension at the bottom.","Lead with your elbow, not your hand — think 'pour a jug'.","Raise to shoulder height only. Higher = traps, not delts.","Use a slow 3-sec lower — that's where the growth is.","Lighter weight done properly beats heavy and sloppy every time."]},
-      {id:"face_pull",name:"Face Pull",range:"3×15",unit:"kg",tips:["Set cable at upper-chest to face height with rope attachment.","Pull toward your forehead, flaring elbows high and wide.","Think: 'show your armpits' at the end of each rep.","Slow and controlled — this is shoulder health work, not ego lifting.","Light weight, high reps. Never rush this one."]}
-    ],
-    core:["Dead Bug — 3×8/side","Pallof Press — 3×10/side"]
-  },
-  B: {
-    label:"Day B", subtitle:"Delts + Back Thickness", exercises:[
-      {id:"flat_db",name:"Flat DB Press",range:"4×6–8",unit:"kg",tips:["Lie flat, feet planted. DBs start at chest height.","Elbows at 45–60° from body — not flared like a chicken.","Press explosively up, control slowly down.","Slight arch in lower back is fine. Ribs up, not flattened.","Touch DBs lightly at top but don't clang and bounce."]},
-      {id:"lat_pd",name:"Lat Pulldown",range:"4×8–10",unit:"kg",tips:["Grip slightly wider than shoulder width. Lean back ~15°.","Pull bar to upper chest — not behind the neck.","Lead with elbows driving down and back.","Squeeze lats hard at bottom, then control the rise.","Avoid using momentum — if you're swinging, the weight's too heavy."]},
-      {id:"sa_row",name:"Single Arm DB Row",range:"3×8–10",unit:"kg",tips:["Brace one hand and same-side knee on a bench.","Back stays flat and parallel to the floor — no rotation.","Pull DB to your hip, not your armpit.","Think: elbow back and up, like starting a lawnmower.","Full stretch at the bottom — let the lat lengthen before pulling."]},
-      {id:"rear_delt",name:"Rear Delt Fly",range:"4×12–15",unit:"kg",tips:["Hinge forward to ~45° or lie face-down on incline bench.","Arms slightly bent, raise out to the sides like wings.","Lead with your elbows — not your hands.","Squeeze rear delts at top. These are small muscles — go light.","Slow and controlled. 2 sec up, 3 sec down."]},
-      {id:"lat_drop",name:"Lateral Raise Drop Set",range:"3 rounds",unit:"kg",tips:["Start at a weight you can do 12 clean reps.","When form breaks, immediately drop 2–4kg and continue.","3 drops per round = one brutal but effective set.","Keep the 'pour a jug' elbow-lead technique throughout.","Rest 90 sec between rounds — these will burn."]},
-      {id:"leg_press",name:"Leg Press",range:"2–3×8–10",unit:"kg",tips:["Feet shoulder-width, mid-height on the platform.","Lower until knees reach ~90° — don't let lower back peel off.","Press through your heels, not your toes.","Don't lock out knees at the top — keep tension on quads.","Controlled descent always. Don't let the sled drop."]}
-    ],
-    core:["Hanging Knee Raises — 3×8–12","Cable Crunch / Ab Wheel — 3×10–12"]
-  },
-  C: {
-    label:"Day C", subtitle:"Lower Bias (optional)", exercises:[
-      {id:"rdl",name:"Romanian Deadlift",range:"4×6–8",unit:"kg",tips:["Stand hip-width, soft bend in knees — keep them fixed.","Push hips back (not down) as you lower the bar.","Bar stays close to your legs the whole way down.","Feel a deep hamstring stretch at the bottom — that's the goal.","Drive hips forward to stand. Squeeze glutes at top."]},
-      {id:"bss",name:"Bulgarian Split Squat",range:"3×8/side",unit:"kg",tips:["Rear foot elevated on bench, front foot far enough forward.","Lower straight down — don't let front knee cave inward.","Front shin stays relatively vertical for more glute work.","Hold DBs at sides or use goblet position for balance.","Go slow on the way down. These will humble you."]},
-      {id:"hip_thrust",name:"Hip Thrust",range:"3×8–10",unit:"kg",tips:["Upper back on bench edge, bar or DB across hip crease.","Feet shoulder-width, toes slightly out.","Drive through heels — squeeze glutes HARD at the top.","Full hip extension at top. Don't just go halfway.","Control the descent. Don't let hips crash down."]},
-      {id:"leg_curl",name:"Leg Curl",range:"3×10–12",unit:"kg",tips:["Lie face down, keep hips pressed into the pad.","Curl heels to glutes — pause at top for 1 sec.","Lower slowly — 3 sec descent is where hamstrings grow.","Don't let your hips rise off the pad to cheat reps.","Last set can go close to failure — isolation is more forgiving."]},
-      {id:"calf",name:"Calf Raises",range:"3×12–15",unit:"kg",tips:["Full range: deep stretch at bottom, full rise at top.","Pause 1 sec at top, 2 sec at bottom for best results.","Single-leg version makes this much harder — worth trying.","Calves are stubborn — squeeze hard and go slow.","Weighted or bodyweight on a step both work well."]},
-      {id:"farmer",name:"Farmer Carries",range:"3 rounds",unit:"kg",tips:["Pick a challenging but manageable weight in each hand.","Walk tall — chest up, shoulders packed down and back.","Short, controlled steps. Don't waddle side to side.","Grip is the limiter — that's the point. Let it burn.","~30m per round is a good target. Rest 60 sec between."]}
-    ],
-    core:[]
-  }
+  A: { label:"Day A", subtitle:"Upper Chest + Lats", exercises:[
+    {id:"incline_db",name:"Incline DB Press",range:"4×6–8",unit:"kg",tips:["Set bench to 30–45°. Higher = more shoulder, lower = more chest.","Dumbbells start at shoulder height, elbows at ~60° from torso (not flared out).","Press up and slightly together — don't lock out hard at top.","Control the descent for 2–3 sec. Feel the stretch at the bottom.","Stop 1–2 reps before form breaks — no ugly grinding."]},
+    {id:"pullups",name:"Pull-Ups",range:"4×5–8",unit:"BW",tips:["Dead hang start — full arm extension, shoulders packed down.","Drive elbows toward your back pockets, not just down.","Chin clears bar = full rep. Don't crane your neck up.","Lower slowly (2–3 sec) — the descent builds more muscle.","If stuck at low reps: use a band or do 3-sec negatives only."]},
+    {id:"cs_row",name:"Chest Supported Row",range:"3×8–10",unit:"kg",tips:["Lie chest-down on the incline pad — let your arms hang freely.","Row to your lower chest/upper stomach, not your chin.","Squeeze shoulder blades together at the top, hold 1 sec.","Elbows should travel at ~45° from body — not straight out.","Keep your chest pinned to the pad throughout. No heaving."]},
+    {id:"ohp",name:"Seated DB Shoulder Press",range:"3×8–10",unit:"kg",tips:["Sit upright with back support. Don't arch aggressively.","Start with DBs at ear height, palms facing forward.","Press straight up — DBs can touch lightly at top.","Don't lock out and rest — keep tension on the delts.","If shoulders feel cooked from yoga, drop weight 10–15% guilt-free."]},
+    {id:"cable_lat",name:"Cable Lateral Raise",range:"4×12–15",unit:"kg",tips:["Cable pulled across the body gives better tension at the bottom.","Lead with your elbow, not your hand — think 'pour a jug'.","Raise to shoulder height only. Higher = traps, not delts.","Use a slow 3-sec lower — that's where the growth is.","Lighter weight done properly beats heavy and sloppy every time."]},
+    {id:"face_pull",name:"Face Pull",range:"3×15",unit:"kg",tips:["Set cable at upper-chest to face height with rope attachment.","Pull toward your forehead, flaring elbows high and wide.","Think: 'show your armpits' at the end of each rep.","Slow and controlled — this is shoulder health work, not ego lifting.","Light weight, high reps. Never rush this one."]},
+  ], core:["Dead Bug — 3×8/side","Pallof Press — 3×10/side"] },
+  B: { label:"Day B", subtitle:"Delts + Back Thickness", exercises:[
+    {id:"flat_db",name:"Flat DB Press",range:"4×6–8",unit:"kg",tips:["Lie flat, feet planted. DBs start at chest height.","Elbows at 45–60° from body — not flared like a chicken.","Press explosively up, control slowly down.","Slight arch in lower back is fine. Ribs up, not flattened.","Touch DBs lightly at top but don't clang and bounce."]},
+    {id:"lat_pd",name:"Lat Pulldown",range:"4×8–10",unit:"kg",tips:["Grip slightly wider than shoulder width. Lean back ~15°.","Pull bar to upper chest — not behind the neck.","Lead with elbows driving down and back.","Squeeze lats hard at bottom, then control the rise.","Avoid using momentum — if you're swinging, the weight's too heavy."]},
+    {id:"sa_row",name:"Single Arm DB Row",range:"3×8–10",unit:"kg",tips:["Brace one hand and same-side knee on a bench.","Back stays flat and parallel to the floor — no rotation.","Pull DB to your hip, not your armpit.","Think: elbow back and up, like starting a lawnmower.","Full stretch at the bottom — let the lat lengthen before pulling."]},
+    {id:"rear_delt",name:"Rear Delt Fly",range:"4×12–15",unit:"kg",tips:["Hinge forward to ~45° or lie face-down on incline bench.","Arms slightly bent, raise out to the sides like wings.","Lead with your elbows — not your hands.","Squeeze rear delts at top. These are small muscles — go light.","Slow and controlled. 2 sec up, 3 sec down."]},
+    {id:"lat_drop",name:"Lateral Raise Drop Set",range:"3 rounds",unit:"kg",tips:["Start at a weight you can do 12 clean reps.","When form breaks, immediately drop 2–4kg and continue.","3 drops per round = one brutal but effective set.","Keep the 'pour a jug' elbow-lead technique throughout.","Rest 90 sec between rounds — these will burn."]},
+    {id:"leg_press",name:"Leg Press",range:"2–3×8–10",unit:"kg",tips:["Feet shoulder-width, mid-height on the platform.","Lower until knees reach ~90° — don't let lower back peel off.","Press through your heels, not your toes.","Don't lock out knees at the top — keep tension on quads.","Controlled descent always. Don't let the sled drop."]},
+  ], core:["Hanging Knee Raises — 3×8–12","Cable Crunch / Ab Wheel — 3×10–12"] },
+  C: { label:"Day C", subtitle:"Lower Bias (optional)", exercises:[
+    {id:"rdl",name:"Romanian Deadlift",range:"4×6–8",unit:"kg",tips:["Stand hip-width, soft bend in knees — keep them fixed.","Push hips back (not down) as you lower the bar.","Bar stays close to your legs the whole way down.","Feel a deep hamstring stretch at the bottom — that's the goal.","Drive hips forward to stand. Squeeze glutes at top."]},
+    {id:"bss",name:"Bulgarian Split Squat",range:"3×8/side",unit:"kg",tips:["Rear foot elevated on bench, front foot far enough forward.","Lower straight down — don't let front knee cave inward.","Front shin stays relatively vertical for more glute work.","Hold DBs at sides or use goblet position for balance.","Go slow on the way down. These will humble you."]},
+    {id:"hip_thrust",name:"Hip Thrust",range:"3×8–10",unit:"kg",tips:["Upper back on bench edge, bar or DB across hip crease.","Feet shoulder-width, toes slightly out.","Drive through heels — squeeze glutes HARD at the top.","Full hip extension at top. Don't just go halfway.","Control the descent. Don't let hips crash down."]},
+    {id:"leg_curl",name:"Leg Curl",range:"3×10–12",unit:"kg",tips:["Lie face down, keep hips pressed into the pad.","Curl heels to glutes — pause at top for 1 sec.","Lower slowly — 3 sec descent is where hamstrings grow.","Don't let your hips rise off the pad to cheat reps.","Last set can go close to failure — isolation is more forgiving."]},
+    {id:"calf",name:"Calf Raises",range:"3×12–15",unit:"kg",tips:["Full range: deep stretch at bottom, full rise at top.","Pause 1 sec at top, 2 sec at bottom for best results.","Single-leg version makes this much harder — worth trying.","Calves are stubborn — squeeze hard and go slow.","Weighted or bodyweight on a step both work well."]},
+    {id:"farmer",name:"Farmer Carries",range:"3 rounds",unit:"kg",tips:["Pick a challenging but manageable weight in each hand.","Walk tall — chest up, shoulders packed down and back.","Short, controlled steps. Don't waddle side to side.","Grip is the limiter — that's the point. Let it burn.","~30m per round is a good target. Rest 60 sec between."]},
+  ], core:[] },
 };
 
 const BENCHMARKS = {
   pullups:{label:"Pull-Ups",start:3,target:9,unit:"reps"},
   incline_db:{label:"Incline DB Press",start:22,target:40,unit:"kg"},
-  ohp:{label:"OHP (per side)",start:12.5,target:20,unit:"kg"}
+  ohp:{label:"OHP (per side)",start:12.5,target:20,unit:"kg"},
 };
 
 const MEALS = [
@@ -106,595 +52,638 @@ const MEALS = [
   {id:"lunch",emoji:"🥗",label:"Lunch",desc:"Veg-heavy + tofu / chicken / eggs"},
   {id:"postworkout",emoji:"💪",label:"Post-Workout",desc:"WPI shake + banana"},
   {id:"dinner",emoji:"🍽️",label:"Dinner",desc:"Carb + protein + veg"},
-  {id:"bedtime",emoji:"🌙",label:"Before Bed",desc:"Cottage cheese or yogurt (optional)"}
+  {id:"bedtime",emoji:"🌙",label:"Before Bed",desc:"Cottage cheese or yogurt (optional)"},
 ];
 
 const NONNEG = [
   {id:"protein",emoji:"🥩",label:"Protein",target:"130g today",colour:"#ef4444"},
   {id:"creatine",emoji:"⚡",label:"Creatine",target:"5g daily",colour:"#8b5cf6"},
-  {id:"water",emoji:"💧",label:"Water",target:"2.5–3L today",colour:"#2563eb"}
+  {id:"water",emoji:"💧",label:"Water",target:"2.5–3L today",colour:T.teal},
 ];
 
 const DEFAULT_HISTORY = {
   incline_db:[{w:22,r:6},{w:22,r:7},{w:22,r:8},{w:24,r:6}],
   pullups:[{w:0,r:3},{w:0,r:4},{w:0,r:4},{w:0,r:5}],
-  cs_row:[{w:18,r:8},{w:18,r:9}],
-  ohp:[{w:12.5,r:8},{w:12.5,r:9},{w:12.5,r:10}],
-  cable_lat:[{w:8,r:12},{w:8,r:14}],
-  face_pull:[{w:12,r:15}],
-  flat_db:[{w:25,r:7},{w:25,r:8}],
-  lat_pd:[{w:40,r:8},{w:40,r:10},{w:45,r:8}],
-  sa_row:[{w:20,r:9}],
-  rear_delt:[{w:8,r:12}],
-  lat_drop:[{w:8,r:12}],
-  leg_press:[{w:60,r:8},{w:60,r:10}],
-  rdl:[{w:40,r:6},{w:40,r:8}],
-  bss:[{w:16,r:8}],
-  hip_thrust:[{w:40,r:8}],
-  leg_curl:[{w:25,r:10}],
-  calf:[{w:30,r:12}],
-  farmer:[{w:20,r:0}]
+  cs_row:[{w:18,r:8},{w:18,r:9}], ohp:[{w:12.5,r:8},{w:12.5,r:9},{w:12.5,r:10}],
+  cable_lat:[{w:8,r:12},{w:8,r:14}], face_pull:[{w:12,r:15}],
+  flat_db:[{w:25,r:7},{w:25,r:8}], lat_pd:[{w:40,r:8},{w:40,r:10},{w:45,r:8}],
+  sa_row:[{w:20,r:9}], rear_delt:[{w:8,r:12}], lat_drop:[{w:8,r:12}],
+  leg_press:[{w:60,r:8},{w:60,r:10}], rdl:[{w:40,r:6},{w:40,r:8}],
+  bss:[{w:16,r:8}], hip_thrust:[{w:40,r:8}], leg_curl:[{w:25,r:10}],
+  calf:[{w:30,r:12}], farmer:[{w:20,r:0}],
 };
-
-// ── STORAGE ──────────────────────────────────────────────────────────────────
 
 const SK = {
   history:"wt_history", week:"wt_week", shoulder:"wt_shoulder",
   bw:"wt_bw", completed:"wt_completed",
-  nutDate:"wt_nut_date", nutChecks:"wt_nut_checks", mealChecks:"wt_meal_checks"
+  nutDate:"wt_nut_date", nutChecks:"wt_nut_checks", mealChecks:"wt_meal_checks",
 };
 
-function lsGet(key, fallback) {
-  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+async function load(key, fallback) {
+  try { const r = await window.storage.get(key); return r ? JSON.parse(r.value) : fallback; }
   catch { return fallback; }
 }
-function lsSet(key, val) {
-  try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
-}
+async function save(key, val) { try { await window.storage.set(key, JSON.stringify(val)); } catch {} }
+const todayStr = () => new Date().toISOString().slice(0,10);
 
-function todayStr() { return new Date().toISOString().slice(0,10); }
+// ── SUBCOMPONENTS ─────────────────────────────────────────────────────────────
 
-// ── STATE ────────────────────────────────────────────────────────────────────
-
-const today = todayStr();
-const savedNutDate = lsGet(SK.nutDate, today);
-const nutFresh = savedNutDate === today;
-
-const state = {
-  view: "home",
-  activeDay: null,
-  logSheet: null,   // {dayKey, exIdx}
-  tipsSheet: null,  // exercise object
-  history: lsGet(SK.history, DEFAULT_HISTORY),
-  sessionLogs: {},
-  shoulderFlag: lsGet(SK.shoulder, false),
-  weekNum: lsGet(SK.week, 3),
-  bodyweight: lsGet(SK.bw, [70.8, 71.0, 71.1]),
-  bwInput: "",
-  chartEx: null,
-  completed: lsGet(SK.completed, {A:false,B:false,C:false}),
-  nutChecks: nutFresh ? lsGet(SK.nutChecks, {protein:false,creatine:false,water:false}) : {protein:false,creatine:false,water:false},
-  mealChecks: nutFresh ? lsGet(SK.mealChecks, {}) : {},
-};
-if (!nutFresh) { lsSet(SK.nutDate, today); lsSet(SK.nutChecks, state.nutChecks); lsSet(SK.mealChecks, state.mealChecks); }
-
-// ── HELPERS ──────────────────────────────────────────────────────────────────
-
-function setState(patch) { Object.assign(state, patch); render(); }
-
-function persist(key, val) { lsSet(key, val); }
-
-function getLastLog(id) { const h = state.history[id]; return h && h.length ? h[h.length-1] : {w:0,r:0}; }
-
-function getPreFill(id) {
-  const last = getLastLog(id);
-  if (state.weekNum !== 7) return last;
-  return {w: Math.round(last.w * 0.8 * 2) / 2, r: last.r};
-}
-
-function isDeload() { return state.weekNum === 7; }
-function phaseColor() { return isDeload() ? "#f59e0b" : state.weekNum <= 3 ? "#2563eb" : "#8b5cf6"; }
-function phaseLabel() { return isDeload() ? "Deload" : state.weekNum <= 3 ? "Add Reps" : "Add Weight"; }
-function isEvening() { return new Date().getHours() >= 20; }
-
-function weightStalled() {
-  const bw = state.bodyweight;
-  if (bw.length < 4) return false;
-  const recent = bw.slice(-4);
-  return (recent[recent.length-1] - recent[0]) < 0.1;
-}
-
-function nutDone() { return Object.values(state.nutChecks).filter(Boolean).length; }
-function mealDone() { return Object.values(state.mealChecks).filter(Boolean).length; }
-
-// ── SVG SPARKLINE ─────────────────────────────────────────────────────────────
-
-function sparklineSVG(data) {
-  if (!data || data.length < 2) return '<span style="font-size:11px;color:#999">Not enough data</span>';
+const Sparkline = ({ data }) => {
+  if (!data || data.length < 2) return <span style={{fontSize:11,color:"#999"}}>Not enough data</span>;
   const vals = data.map(d => d.r || d.w);
-  const mn = Math.min(...vals), mx = Math.max(...vals), rng = mx - mn || 1;
-  const W = 80, H = 28;
-  const pts = vals.map((v,i) => `${(i/(vals.length-1))*W},${H-((v-mn)/rng)*(H-4)-2}`).join(" ");
-  const up = vals[vals.length-1] >= vals[0];
-  const col = up ? "#22c55e" : "#ef4444";
-  const circles = vals.map((v,i) => `<circle cx="${(i/(vals.length-1))*W}" cy="${H-((v-mn)/rng)*(H-4)-2}" r="2.5" fill="${col}"/>`).join("");
-  return `<svg width="${W}" height="${H}"><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round"/>${circles}</svg>`;
-}
+  const mn = Math.min(...vals), mx = Math.max(...vals), rng = mx-mn||1;
+  const W=80,H=28;
+  const pts = vals.map((v,i)=>`${(i/(vals.length-1))*W},${H-((v-mn)/rng)*(H-4)-2}`).join(" ");
+  const up = vals[vals.length-1]>=vals[0];
+  return (
+    <svg width={W} height={H}>
+      <polyline points={pts} fill="none" stroke={up?T.mid:"#ef4444"} strokeWidth={2} strokeLinejoin="round"/>
+      {vals.map((v,i)=><circle key={i} cx={(i/(vals.length-1))*W} cy={H-((v-mn)/rng)*(H-4)-2} r={2.5} fill={up?T.mid:"#ef4444"}/>)}
+    </svg>
+  );
+};
 
-// ── RENDER HELPERS ───────────────────────────────────────────────────────────
+const PBar = ({value,max,gradient=false}) => (
+  <div style={{background:"#f0f0f0",borderRadius:99,height:6,overflow:"hidden"}}>
+    <div style={{width:`${Math.min((value/max)*100,100)}%`,height:"100%",background:gradient?T.grad:T.teal,borderRadius:99,transition:"width 0.4s"}}/>
+  </div>
+);
 
-function pbarHTML(value, max, color="#1a1a1a") {
-  const pct = Math.min((value/max)*100,100);
-  return `<div class="pbar-wrap"><div class="pbar-fill" style="width:${pct}%;background:${color}"></div></div>`;
-}
+const SectionLabel = ({children,style={}}) => (
+  <div style={{fontSize:12,fontWeight:700,color:T.accent,textTransform:"uppercase",letterSpacing:0.8,marginBottom:12,...style}}>{children}</div>
+);
 
-function toggleHTML(on, id) {
-  return `<div class="toggle" id="${id}" style="background:${on?"#f59e0b":"#ddd"}"><div class="toggle-knob" style="left:${on?21:3}px"></div></div>`;
-}
+// ── MAIN ──────────────────────────────────────────────────────────────────────
 
-// ── VIEWS ────────────────────────────────────────────────────────────────────
+export default function App() {
+  const [ready,setReady] = useState(false);
+  const [view,setView] = useState("home");
+  const [activeDay,setActiveDay] = useState(null);
+  const [logSheet,setLogSheet] = useState(null);
+  const [tipsSheet,setTipsSheet] = useState(null);
+  const [history,setHistory] = useState(DEFAULT_HISTORY);
+  const [sessionLogs,setSessionLogs] = useState({});
+  const [shoulderFlag,setShoulderFlag] = useState(false);
+  const [weekNum,setWeekNum] = useState(3);
+  const [bodyweight,setBodyweight] = useState([70.8,71.0,71.1]);
+  const [bwInput,setBwInput] = useState("");
+  const [chartEx,setChartEx] = useState(null);
+  const [completed,setCompleted] = useState({A:false,B:false,C:false});
+  const [nutChecks,setNutChecks] = useState({protein:false,creatine:false,water:false});
+  const [mealChecks,setMealChecks] = useState({});
 
-function renderHome() {
-  const wn = state.weekNum;
-  const dots = [1,2,3,4,5,6,7].map(w =>
-    `<div class="week-dot" onclick="setWeek(${w})" style="background:${w<wn?"#fff":w===wn?phaseColor():"#444"}"></div>`
-  ).join("");
+  const isDeload = weekNum===7;
+  const hr = new Date().getHours();
+  const mn = new Date().getMinutes();
+  const timeVal = hr + mn/60;
+  const isEvening = hr>=17;
 
-  const sf = state.shoulderFlag;
-  const nd = nutDone(), md = mealDone();
-  const nutDots = NONNEG.map(n => `<div style="width:10px;height:10px;border-radius:50%;background:${state.nutChecks[n.id]?n.colour:"#ddd"}"></div>`).join("");
+  const greeting = (() => {
+    if (timeVal>=8 && timeVal<11.5) return "Good morning 👋🏼";
+    if (timeVal>=11.5 && timeVal<13) return "Lunch 🍽️";
+    if (timeVal>=13 && timeVal<17) return "Good afternoon 🙌🏼";
+    if (timeVal>=17 && timeVal<24) return "Good evening 🙂‍↕️";
+    if (timeVal>=0 && timeVal<5) return "Hey nightowl 🦉";
+    return "Hey earlybird 🦆";
+  })();
 
-  const daycards = Object.entries(DAYS).map(([key, day]) => {
-    const done = state.completed[key];
-    const chips = day.exercises.slice(0,3).map(ex => {
-      const pre = getPreFill(ex.id);
-      return `<div style="background:#f4f4f4;border-radius:8px;padding:4px 10px;font-size:12px;color:#555">${ex.name.split(" ").slice(0,2).join(" ")} · ${ex.unit==="BW"?`BW×${pre.r}`:`${pre.w}kg`}</div>`;
-    }).join("") + (day.exercises.length>3?`<div style="background:#f4f4f4;border-radius:8px;padding:4px 10px;font-size:12px;color:#aaa">+${day.exercises.length-3} more</div>`:"");
+  const MOTTOS = ["Start before you feel ready.","Today counts. Begin.","One set is enough to start.","Show up. That's the win.","Begin messy. Improve later.","Five minutes. That's all you need.","Start small. Stay consistent.","Action creates motivation.","Put your shoes on. Go.","The first rep changes everything.","You don't need perfect conditions.","Just walk into the gym.","Start tired. Finish proud.","Today is a good day to begin.","One workout ahead of regret.","Don't think. Do the warm-up.","Start now. Adjust later.","Momentum loves starters.","Begin with one clean rep.","The door is the hardest part.","Show up imperfect.","Your future self votes today.","Build the habit. Not the mood.","Start light. Stay steady.","A short session still counts.","Start where you are.","Action over analysis.","The plan works when you begin.","Today's effort compounds.","Just press record on the habit.","First rep. No drama.","Don't wait for motivation. Create it.","Ten minutes beats zero.","Start quietly.","Begin with breath and movement.","One decision. That's all.","Turn up for yourself today.","Make today a training day.","Start before doubt speaks.","Small action. Big trajectory.","Move your body. Clear your mind.","The warm-up is the gateway.","Start with what you can do.","Done is better than delayed.","You only need to begin.","Lace up. That's step one.","Start now. Thank yourself later.","Begin again if you must.","Today is for showing up."];
+  const [motto] = useState(()=>MOTTOS[Math.floor(Math.random()*MOTTOS.length)]);
 
-    return `<div class="card" style="background:${done?"#f8f8f8":"#fff"};border:1.5px solid ${done?"#e5e5e5":"#1a1a1a"};cursor:pointer" onclick="openDay('${key}')">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
-            <span style="font-size:16px;font-weight:800">${day.label}</span>
-            ${key==="C"?'<span class="tag optional-tag">OPTIONAL</span>':""}
-            ${done?'<span style="font-size:12px">✅</span>':""}
-            ${isDeload()?'<span class="tag deload-tag">🔄 DELOAD</span>':""}
-          </div>
-          <div style="font-size:13px;color:#666">${day.subtitle}</div>
-        </div>
-        <div style="font-size:20px;color:#ccc">›</div>
-      </div>
-      <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px">${chips}</div>
-    </div>`;
-  }).join("");
+  const WEEK_GRADS = {
+    1:"linear-gradient(315deg,#a8ed6a,#2dd4a0)",
+    2:"linear-gradient(315deg,#96e84a,#1fc99a)",
+    3:"linear-gradient(315deg,#7de02a,#18bc8e)",
+    4:"linear-gradient(315deg,#5ed800,#12a87e)",
+    5:"linear-gradient(315deg,#44cc00,#0e9870)",
+    6:"linear-gradient(315deg,#2ebd00,#0a8862)",
+    7:"linear-gradient(315deg,#fde68a,#fbbf24)",
+  };
+  const phaseGrad = WEEK_GRADS[weekNum] || WEEK_GRADS[1];
+  const phaseGradFinal = phaseGrad;
+  const phaseLabel = isDeload?"Deload":weekNum<=3?"Add Reps":"Add Weight";
+  const weekTextLight = weekNum <= 3;
+  const wTxt = weekTextLight ? "rgba(10,60,40,0.9)" : "#fff";
+  const wTxtMuted = weekTextLight ? "rgba(10,60,40,0.55)" : "rgba(255,255,255,0.7)";
 
-  const bwLast = state.bodyweight[state.bodyweight.length-1];
+  const weightStalled = (() => {
+    if(bodyweight.length<4) return false;
+    const r=bodyweight.slice(-4);
+    return r[r.length-1]-r[0]<0.1;
+  })();
 
-  return `<div class="page">
-    <div class="page-header">
-      <div class="big-title">Good morning 👋</div>
-      <div class="subtitle">Let's make progress today.</div>
-    </div>
+  const nutDone = Object.values(nutChecks).filter(Boolean).length;
+  const mealDone = Object.values(mealChecks).filter(Boolean).length;
 
-    <div class="card card-dark" style="margin-bottom:16px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div>
-          <div style="font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.5px">Training Wave</div>
-          <div style="font-size:20px;font-weight:800;margin-top:2px">Week ${wn} / 7</div>
-        </div>
-        <div class="pill" style="background:${phaseColor()};color:#fff">${phaseLabel()}</div>
-      </div>
-      <div class="week-dots">${dots}</div>
-      <div style="font-size:11px;color:#888;margin-top:8px">${isDeload()?"🔄 Deload — 80% weight, half sets.":wn<=3?"📈 Add reps within range":"📈 Increase weight once at top of range"}</div>
-    </div>
+  useEffect(()=>{
+    (async()=>{
+      const [h,w,s,bw,c,nd,nc,mc] = await Promise.all([
+        load(SK.history,DEFAULT_HISTORY), load(SK.week,3), load(SK.shoulder,false),
+        load(SK.bw,[70.8,71.0,71.1]), load(SK.completed,{A:false,B:false,C:false}),
+        load(SK.nutDate,todayStr()), load(SK.nutChecks,{protein:false,creatine:false,water:false}),
+        load(SK.mealChecks,{}),
+      ]);
+      const today=todayStr();
+      setHistory(h); setWeekNum(w); setShoulderFlag(s); setBodyweight(bw); setCompleted(c);
+      if(nd!==today){
+        setNutChecks({protein:false,creatine:false,water:false}); setMealChecks({});
+        save(SK.nutDate,today); save(SK.nutChecks,{protein:false,creatine:false,water:false}); save(SK.mealChecks,{});
+      } else { setNutChecks(nc); setMealChecks(mc); }
+      setReady(true);
+    })();
+  },[]);
 
-    <div class="card" style="background:${sf?"#fff3cd":"#f8f8f8"};border:1px solid ${sf?"#f59e0b":"#eee"};display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <div>
-        <div style="font-size:13px;font-weight:700;color:${sf?"#92400e":"#333"}">${sf?"⚠️ Shoulder Fatigue Flagged":"🏋️ Shoulders feeling good"}</div>
-        <div style="font-size:12px;color:#888;margin-top:2px">${sf?"Reduce pressing sets by 1 this week":"Tap to flag fatigue"}</div>
-      </div>
-      ${toggleHTML(sf, "shoulder-toggle")}
-    </div>
+  const ph = (key,val,setter) => { setter(val); save(key,val); };
+  const getLastLog = id => { const h=history[id]; return h?.length?h[h.length-1]:{w:0,r:0}; };
+  const getPreFill = id => { const l=getLastLog(id); return isDeload?{w:Math.round(l.w*0.8*2)/2,r:l.r}:l; };
 
-    <div class="card" style="background:${nd===3?"#f0fff4":"#f8f8f8"};border:1.5px solid ${nd===3?"#86efac":"#eee"};display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;cursor:pointer" onclick="setView('nutrition')">
-      <div>
-        <div style="font-size:13px;font-weight:700">🥗 Today's Nutrition</div>
-        <div style="font-size:12px;color:#888;margin-top:2px">${nd}/3 non-negotiables · ${md}/5 meals</div>
-      </div>
-      <div style="display:flex;gap:6px;align-items:center">${nutDots}</div>
-    </div>
+  const openLog = (dayKey,exIdx) => {
+    const ex=DAYS[dayKey].exercises[exIdx], pre=getPreFill(ex.id);
+    setSessionLogs(p=>({...p,[ex.id]:p[ex.id]||{w:pre.w,r:pre.r}}));
+    setLogSheet({dayKey,exIdx});
+  };
 
-    <div class="section-label">This Week's Sessions</div>
-    ${daycards}
+  const saveLog = () => {
+    const ex=DAYS[logSheet.dayKey].exercises[logSheet.exIdx], entry=sessionLogs[ex.id];
+    if(entry){ const h={...history,[ex.id]:[...(history[ex.id]||[]),{w:Number(entry.w),r:Number(entry.r)}]}; ph(SK.history,h,setHistory); }
+    setLogSheet(null);
+  };
 
-    <div class="card card-gray" style="margin-bottom:0">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div>
-          <div style="font-size:14px;font-weight:700">Bodyweight</div>
-          <div style="font-size:12px;color:#888">Target: +0.1–0.2kg/month</div>
-        </div>
-        <div style="font-size:22px;font-weight:800">${bwLast}kg</div>
-      </div>
-      ${sparklineSVG(state.bodyweight.map(w=>({w,r:w})))}
-      <div style="display:flex;gap:8px;margin-top:12px">
-        <input id="bw-input" type="number" value="${state.bwInput}" placeholder="Log today's weight" oninput="state.bwInput=this.value"
-          style="flex:1;border:1.5px solid #e5e5e5;border-radius:10px;padding:10px 12px;font-size:14px;outline:none;font-family:inherit">
-        <button class="btn btn-dark" style="border-radius:10px;padding:10px 16px;font-size:14px" onclick="logBW()">Log</button>
-      </div>
-    </div>
-  </div>`;
-}
-
-function renderSession() {
-  const key = state.activeDay;
-  if (!key) return "";
-  const day = DAYS[key];
-  const loggedCount = day.exercises.filter(ex => state.sessionLogs[ex.id]).length;
-  const progress = loggedCount / day.exercises.length;
-
-  const sfWarn = state.shoulderFlag && (key==="A"||key==="B")
-    ? `<div class="card card-yellow" style="margin-bottom:14px;font-size:13px;color:#92400e">⚠️ Shoulder fatigue — reduce pressing sets by 1 today</div>` : "";
-
-  const exRows = day.exercises.map((ex, i) => {
-    const entry = state.sessionLogs[ex.id];
-    const pre = getPreFill(ex.id);
-    const last = getLastLog(ex.id);
-    const isBW = ex.unit === "BW";
-    const improved = entry && (Number(entry.r) > last.r || Number(entry.w) > last.w);
-    const statusLine = entry
-      ? `<div style="font-size:13px;color:#16a34a;font-weight:700;margin-top:4px">${isBW?`BW × ${entry.r} reps`:`${entry.w}kg × ${entry.r} reps`}${improved?" 🔥":""}</div>`
-      : `<div style="font-size:12px;color:#bbb;margin-top:4px">Pre-filled: ${isBW?`BW×${pre.r}`:`${pre.w}kg×${pre.r}`}${isDeload()?" (80%)":""}</div>`;
-
-    return `<div class="exercise-row" style="background:${entry?"#f0fff4":"#fff"};border:1.5px solid ${entry?"#86efac":"#e5e5e5"}">
-      <div style="flex:1" onclick="openLog('${key}',${i})">
-        <div style="font-size:15px;font-weight:700">${ex.name}</div>
-        <div style="font-size:12px;color:#888;margin-top:2px">${ex.range}</div>
-        ${statusLine}
-      </div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <button onclick="openTips(${JSON.stringify(ex).replace(/"/g,'&quot;')})" style="background:#f4f4f4;border:none;border-radius:10px;width:34px;height:34px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">💡</button>
-        <div onclick="openLog('${key}',${i})" style="font-size:${entry?20:24}px;color:${entry?"#22c55e":"#ddd"};cursor:pointer">${entry?"✓":"+"}</div>
-      </div>
-    </div>`;
-  }).join("");
-
-  const coreSection = day.core.length ? `<div class="card card-gray" style="margin-bottom:16px">
-    <div class="section-label" style="margin-bottom:8px">Core</div>
-    ${day.core.map(c=>`<div style="font-size:13px;color:#555;margin-bottom:4px">• ${c}</div>`).join("")}
-  </div>` : "";
-
-  return `<div class="page">
-    <div style="padding-top:56px;margin-bottom:20px">
-      <button onclick="setView('home')" style="background:none;border:none;font-size:14px;color:#666;cursor:pointer;padding:0;margin-bottom:12px;font-family:inherit">← Back</button>
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="font-size:24px;font-weight:800">${day.label}</div>
-        ${isDeload()?'<span class="tag deload-tag" style="font-size:11px;padding:3px 9px">🔄 Deload</span>':""}
-      </div>
-      <div style="font-size:14px;color:#666">${day.subtitle}</div>
-      <div style="margin-top:12px">${pbarHTML(loggedCount, day.exercises.length)}</div>
-      <div style="font-size:12px;color:#888;margin-top:6px">${loggedCount} / ${day.exercises.length} logged</div>
-    </div>
-    ${sfWarn}
-    ${exRows}
-    ${coreSection}
-    <button class="btn btn-dark btn-full" onclick="finishSession('${key}')">Finish Session ✓</button>
-  </div>`;
-}
-
-function renderProgress() {
-  const benchCards = Object.entries(BENCHMARKS).map(([id,b]) => {
-    const h = state.history[id] || [];
-    const current = h.length ? (b.unit==="reps" ? h[h.length-1].r : h[h.length-1].w) : b.start;
-    const pct = Math.round(Math.max(0, ((current-b.start)/(b.target-b.start))*100));
-    return `<div class="card card-gray" style="margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
-        <div style="font-size:14px;font-weight:700">${b.label}</div>
-        <div style="font-size:13px;font-weight:800">${current} <span style="color:#aaa;font-weight:400">/ ${b.target} ${b.unit}</span></div>
-      </div>
-      ${pbarHTML(current-b.start, b.target-b.start)}
-      <div style="font-size:11px;color:#aaa;margin-top:6px">${pct}% to goal</div>
-    </div>`;
-  }).join("");
-
+  const finishSession = key => { const c={...completed,[key]:true}; ph(SK.completed,c,setCompleted); setActiveDay(null); setView("home"); };
   const allEx = Object.values(DAYS).flatMap(d=>d.exercises);
-  const exCards = allEx.map(ex => {
-    const h = state.history[ex.id];
-    if (!h || h.length < 2) return "";
-    const latest = h[h.length-1], first = h[0];
-    const up = ex.unit==="BW" ? latest.r > first.r : latest.w > first.w || latest.r > first.r;
-    const expanded = state.chartEx === ex.id;
-    const history_chips = expanded ? `<div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">
-      ${h.map((e,i)=>`<div style="background:#f4f4f4;border-radius:8px;padding:4px 10px;font-size:12px;color:#555">#${i+1}: ${ex.unit==="BW"?`BW×${e.r}`:`${e.w}kg×${e.r}`}</div>`).join("")}
-    </div>` : "";
-    return `<div class="card card-white" style="margin-bottom:10px;cursor:pointer" onclick="toggleChart('${ex.id}')">
-      <div style="display:flex;justify-content:space-between;align-items:center">
+
+  if(!ready) return (
+    <div style={{display:"flex",alignItems:"center",justifyContent:"center",height:"100vh",fontFamily:"-apple-system,sans-serif"}}>
+      <div style={{textAlign:"center"}}>
+        <div style={{fontSize:40,marginBottom:12,filter:`drop-shadow(${T.glowSm})`}}>💪</div>
+        <div style={{fontSize:14,color:T.accent,fontWeight:600}}>Loading your data…</div>
+      </div>
+    </div>
+  );
+
+  // ── SHEETS ───────────────────────────────────────────────────────────────
+
+  const TipsSheet = () => {
+    if(!tipsSheet) return null;
+    return (
+      <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:200,display:"flex",alignItems:"flex-end"}}>
+        <div style={{background:"#fff",width:"100%",borderRadius:"20px 20px 0 0",padding:"24px 20px 48px",maxHeight:"75vh",overflowY:"auto"}}>
+          <div style={{width:36,height:4,background:"#ddd",borderRadius:99,margin:"0 auto 20px"}}/>
+          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:18}}>
+            <div style={{width:40,height:40,borderRadius:12,background:T.gradSubtle,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,border:`1.5px solid rgba(14,184,160,0.2)`}}>💡</div>
+            <div><div style={{fontSize:17,fontWeight:800,color:T.dark}}>{tipsSheet.name}</div><div style={{fontSize:12,color:"#888"}}>Form & technique tips</div></div>
+          </div>
+          {tipsSheet.tips.map((tip,i)=>(
+            <div key={i} style={{display:"flex",gap:12,marginBottom:14,alignItems:"flex-start"}}>
+              <div style={{background:T.grad,borderRadius:99,width:22,height:22,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:800,flexShrink:0,marginTop:1,color:"#fff"}}>{i+1}</div>
+              <div style={{fontSize:14,color:"#333",lineHeight:1.5}}>{tip}</div>
+            </div>
+          ))}
+          <button onClick={()=>setTipsSheet(null)} style={{width:"100%",background:T.grad,color:"#fff",border:"none",borderRadius:14,padding:"16px",fontSize:15,fontWeight:800,cursor:"pointer",boxShadow:T.glowSm,marginTop:8}}>Got it ✓</button>
+        </div>
+      </div>
+    );
+  };
+
+  const LogSheet = () => {
+    if(!logSheet) return null;
+    const ex=DAYS[logSheet.dayKey].exercises[logSheet.exIdx];
+    const log=sessionLogs[ex.id]||{w:0,r:0}, last=getLastLog(ex.id), isBW=ex.unit==="BW";
+    const adj=(field,delta)=>setSessionLogs(p=>({...p,[ex.id]:{...p[ex.id],[field]:Math.max(0,Number(p[ex.id]?.[field]||0)+delta)}}));
+    return (
+      <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.4)",zIndex:100,display:"flex",alignItems:"flex-end"}}>
+        <div style={{background:"#fff",width:"100%",borderRadius:"20px 20px 0 0",padding:"24px 20px 40px"}}>
+          <div style={{width:36,height:4,background:"#ddd",borderRadius:99,margin:"0 auto 20px"}}/>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:4}}>
+            <div>
+              <div style={{fontSize:18,fontWeight:700,color:T.dark}}>{ex.name}</div>
+              <div style={{fontSize:13,color:"#888",marginTop:2}}>
+                {ex.range} · Last: {isBW?`BW×${last.r}`:`${last.w}kg×${last.r}`}
+                {isDeload&&<span style={{color:"#f59e0b",fontWeight:700}}> · 🔄 80%</span>}
+              </div>
+            </div>
+            <button onClick={()=>{setLogSheet(null);setTipsSheet(ex);}} style={{background:T.gradSubtle,border:`1.5px solid rgba(14,184,160,0.25)`,borderRadius:10,padding:"6px 12px",fontSize:12,fontWeight:700,cursor:"pointer",color:T.accent}}>💡 Tips</button>
+          </div>
+          {isDeload&&<div style={{background:"#fff8e6",border:"1px solid #f59e0b",borderRadius:10,padding:"8px 12px",marginTop:10,fontSize:12,color:"#92400e"}}>🔄 Deload — weight auto-set to 80%. Cut sets in half.</div>}
+          {!isBW&&(
+            <div style={{marginTop:18,marginBottom:20}}>
+              <div style={{fontSize:12,color:T.accent,fontWeight:700,marginBottom:10,textTransform:"uppercase",letterSpacing:0.5}}>Weight (kg)</div>
+              <div style={{display:"flex",alignItems:"center",gap:16}}>
+                <button onClick={()=>adj("w",-1)} style={{background:"#f4f4f4",color:"#333",border:"none",borderRadius:12,padding:"12px 20px",fontSize:15,fontWeight:700,cursor:"pointer",minWidth:56}}>−1</button>
+                <div style={{fontSize:32,fontWeight:800,flex:1,textAlign:"center",color:T.dark}}>{log.w}</div>
+                <button onClick={()=>adj("w",1)} style={{background:T.grad,color:"#fff",border:"none",borderRadius:12,padding:"12px 20px",fontSize:15,fontWeight:700,cursor:"pointer",minWidth:56}}>+1</button>
+              </div>
+            </div>
+          )}
+          <div style={{marginBottom:28}}>
+            <div style={{fontSize:12,color:T.accent,fontWeight:700,marginBottom:10,textTransform:"uppercase",letterSpacing:0.5}}>Top Set Reps</div>
+            <div style={{display:"flex",alignItems:"center",gap:16}}>
+              <button onClick={()=>adj("r",-1)} style={{background:"#f4f4f4",color:"#333",border:"none",borderRadius:12,padding:"12px 20px",fontSize:15,fontWeight:700,cursor:"pointer",minWidth:56}}>−1</button>
+              <div style={{fontSize:32,fontWeight:800,flex:1,textAlign:"center",color:T.dark}}>{log.r}</div>
+              <button onClick={()=>adj("r",1)} style={{background:T.grad,color:"#fff",border:"none",borderRadius:12,padding:"12px 20px",fontSize:15,fontWeight:700,cursor:"pointer",minWidth:56}}>+1</button>
+            </div>
+          </div>
+          <button onClick={saveLog} style={{width:"100%",background:T.grad,color:"#fff",border:"none",borderRadius:14,padding:"16px",fontSize:16,fontWeight:800,cursor:"pointer",boxShadow:T.glowSm}}>Log Top Set ✓</button>
+          <button onClick={()=>setLogSheet(null)} style={{width:"100%",padding:"12px",fontSize:14,color:"#888",background:"none",border:"none",marginTop:8,cursor:"pointer"}}>Cancel</button>
+        </div>
+      </div>
+    );
+  };
+
+  // ── HOME ──────────────────────────────────────────────────────────────────
+
+  const HomeView = () => (
+    <div style={{padding:"0 20px 100px"}}>
+      <div style={{paddingTop:56,marginBottom:24}}>
+        <div style={{fontSize:26,fontWeight:800,letterSpacing:-0.5,color:T.dark}}>{greeting}</div>
+        <div style={{fontSize:14,color:"#888",marginTop:4}}>{motto}</div>
+      </div>
+
+      {/* Week wave — gradient + subtle glow */}
+      <div style={{background:phaseGrad,borderRadius:22,padding:"20px 20px 18px",marginBottom:20,color:"#fff",boxShadow:T.glow,position:"relative",overflow:"hidden"}}>
+        <div style={{position:"absolute",top:-30,right:-30,width:120,height:120,borderRadius:"50%",background:"rgba(255,255,255,0.08)",pointerEvents:"none"}}/>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
+          <div>
+            <div style={{fontSize:11,color:"rgba(255,255,255,0.7)",textTransform:"uppercase",letterSpacing:0.8}}>Training Wave</div>
+            <div style={{fontSize:22,fontWeight:800,marginTop:2}}>Week {weekNum} / 7</div>
+          </div>
+          <div style={{display:"flex",gap:8,alignItems:"center"}}>
+            <div style={{background:"rgba(255,255,255,0.22)",backdropFilter:"blur(8px)",borderRadius:99,padding:"6px 16px",fontSize:12,fontWeight:700}}>{phaseLabel}</div>
+            <button onClick={()=>ph(SK.week,1,setWeekNum)} style={{background:"rgba(255,255,255,0.18)",backdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,0.35)",borderRadius:99,padding:"6px 12px",fontSize:11,fontWeight:700,color:"#fff",cursor:"pointer"}}>↺ Reset</button>
+          </div>
+
+        </div>
+        <div style={{display:"flex",gap:6}}>
+          {[1,2,3,4,5,6,7].map(w=>(
+            <div key={w} onClick={()=>ph(SK.week,w,setWeekNum)} style={{flex:1,height:8,borderRadius:99,cursor:"pointer",background:w<weekNum?"rgba(255,255,255,0.9)":w===weekNum?"rgba(255,255,255,0.55)":"rgba(255,255,255,0.2)",transition:"background 0.2s"}}/>
+          ))}
+        </div>
+        <div style={{fontSize:11,color:"rgba(255,255,255,0.7)",marginTop:10}}>
+          {isDeload?"🔄 Deload — 80% weight, half sets.":weekNum<=3?"📈 Add reps within range":"📈 Increase weight once at top of range"}
+        </div>
+      </div>
+
+      {/* Shoulder alert */}
+      <div style={{borderRadius:16,padding:"14px 16px",marginBottom:14,background:shoulderFlag?"#fff3cd":"#f8f8f8",border:`1px solid ${shoulderFlag?"#f59e0b":"#eee"}`,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
         <div>
-          <div style="font-size:14px;font-weight:700">${ex.name}</div>
-          <div style="font-size:12px;color:${up?"#16a34a":"#888"};margin-top:2px;font-weight:${up?700:400}">
-            ${ex.unit==="BW"?`BW×${latest.r} reps`:`${latest.w}kg × ${latest.r} reps`} ${up?"↑":""}
+          <div style={{fontSize:13,fontWeight:700,color:shoulderFlag?"#92400e":T.dark}}>{shoulderFlag?"⚠️ Shoulder Fatigue Flagged":"🏋️ Shoulders feeling good"}</div>
+          <div style={{fontSize:12,color:"#888",marginTop:2}}>{shoulderFlag?"Reduce pressing sets by 1 this week":"Tap to flag fatigue"}</div>
+        </div>
+        <div onClick={()=>ph(SK.shoulder,!shoulderFlag,setShoulderFlag)} style={{width:44,height:26,borderRadius:99,cursor:"pointer",background:shoulderFlag?"#f59e0b":T.teal,position:"relative",transition:"background 0.2s",boxShadow:shoulderFlag?"none":T.glowSm}}>
+          <div style={{width:20,height:20,borderRadius:"50%",background:"#fff",position:"absolute",top:3,left:shoulderFlag?21:3,transition:"left 0.2s",boxShadow:"0 1px 3px rgba(0,0,0,0.2)"}}/>
+        </div>
+      </div>
+
+      {/* Nutrition preview */}
+      <div onClick={()=>setView("nutrition")} style={{borderRadius:16,padding:"14px 16px",marginBottom:14,background:nutDone===3?T.gradSubtle:"#f8f8f8",border:`1.5px solid ${nutDone===3?"rgba(14,184,160,0.3)":"#eee"}`,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <div>
+          <div style={{fontSize:13,fontWeight:700,color:T.dark}}>🥗 Today's Nutrition</div>
+          <div style={{fontSize:12,color:"#888",marginTop:2}}>{nutDone}/3 non-negotiables · {mealDone}/5 meals</div>
+        </div>
+        <div style={{display:"flex",gap:6}}>
+          {NONNEG.map(n=><div key={n.id} style={{width:10,height:10,borderRadius:"50%",background:nutChecks[n.id]?n.colour:"#ddd",boxShadow:nutChecks[n.id]?`0 0 6px ${n.colour}66`:""}}/>)}
+        </div>
+      </div>
+
+      {/* Deload week — replaces day cards */}
+      {isDeload ? (
+        <div>
+          <SectionLabel>Deload Week 🔄</SectionLabel>
+
+          {/* Why it matters */}
+          <div style={{background:T.gradSubtle,border:`1.5px solid rgba(14,184,160,0.2)`,borderRadius:18,padding:"16px 18px",marginBottom:14}}>
+            <div style={{fontSize:15,fontWeight:800,color:T.dark,marginBottom:6}}>Why this week matters</div>
+            <div style={{fontSize:13,color:"#555",lineHeight:1.6}}>Your muscles grow during recovery, not during training. This week lets your joints, tendons, and nervous system catch up — so you come back to Week 1 stronger, not just fresher. Don't skip it.</div>
+          </div>
+
+          {/* Per-day deload cards */}
+          {[
+            { label:"Day A", subtitle:"Upper Chest + Lats", exercises:[
+              {name:"Incline DB Press", adj:"80% weight · 2 sets"},
+              {name:"Pull-Ups", adj:"80% effort · 2 sets — stop well short of failure"},
+              {name:"Chest Supported Row", adj:"80% weight · 2 sets"},
+              {name:"Seated DB Shoulder Press", adj:"80% weight · 2 sets"},
+              {name:"Cable Lateral Raise", adj:"Light · 2 sets — focus on feel"},
+              {name:"Face Pull", adj:"Light · 2 sets — shoulder health priority"},
+            ], core:"Keep Dead Bug + Pallof Press — full sets, clean reps"},
+            { label:"Day B", subtitle:"Delts + Back Thickness", exercises:[
+              {name:"Flat DB Press", adj:"80% weight · 2 sets"},
+              {name:"Lat Pulldown", adj:"80% weight · 2 sets"},
+              {name:"Single Arm DB Row", adj:"80% weight · 2 sets"},
+              {name:"Rear Delt Fly", adj:"Light · 2 sets"},
+              {name:"Lateral Raise", adj:"Light only · 2 sets — no drop set this week"},
+              {name:"Leg Press", adj:"80% weight · 2 sets"},
+            ], core:"Keep Hanging Knee Raises + Ab Wheel — full sets"},
+            { label:"Day C", subtitle:"Lower Bias (optional — skip if fatigued)", optional:true, exercises:[
+              {name:"Romanian Deadlift", adj:"80% weight · 2 sets"},
+              {name:"Bulgarian Split Squat", adj:"80% weight · 2 sets"},
+              {name:"Hip Thrust", adj:"80% weight · 2 sets"},
+              {name:"Leg Curl", adj:"80% weight · 2 sets"},
+              {name:"Calf Raises", adj:"Bodyweight or light · 2 sets"},
+              {name:"Farmer Carries", adj:"Skip this week — grip/CNS recovery"},
+            ], core:null},
+          ].map((day,di)=>(
+            <div key={di} style={{background:"#fff",border:`1.5px solid #eee`,borderRadius:18,padding:"16px 18px",marginBottom:12}}>
+              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+                <div style={{fontSize:15,fontWeight:800,color:T.dark}}>{day.label}</div>
+                {day.optional&&<span style={{fontSize:10,background:"#f0f0f0",borderRadius:6,padding:"2px 7px",fontWeight:600,color:"#888"}}>OPTIONAL</span>}
+                <span style={{fontSize:10,background:"#fff3cd",borderRadius:6,padding:"2px 7px",fontWeight:600,color:"#92400e"}}>🔄 DELOAD</span>
+              </div>
+              <div style={{fontSize:12,color:"#888",marginBottom:10}}>{day.subtitle}</div>
+              {day.exercises.map((ex,ei)=>(
+                <div key={ei} style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",paddingBottom:7,marginBottom:7,borderBottom:ei<day.exercises.length-1?"1px solid #f4f4f4":"none"}}>
+                  <div style={{fontSize:13,fontWeight:600,color:T.dark,flex:1}}>{ex.name}</div>
+                  <div style={{fontSize:12,color:T.accent,fontWeight:500,textAlign:"right",marginLeft:8}}>{ex.adj}</div>
+                </div>
+              ))}
+              {day.core&&<div style={{marginTop:10,background:T.gradSubtle,borderRadius:10,padding:"8px 12px",fontSize:12,color:T.accent,border:`1px solid rgba(14,184,160,0.15)`}}>🧘 {day.core}</div>}
+            </div>
+          ))}
+
+          {/* Reset prompt */}
+          <div style={{background:"#f8f8f8",borderRadius:16,padding:"14px 18px",marginBottom:12,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <div>
+              <div style={{fontSize:13,fontWeight:700,color:T.dark}}>Ready to start Wave 2?</div>
+              <div style={{fontSize:12,color:"#888",marginTop:2}}>Tap Reset to begin Week 1 fresh.</div>
+            </div>
+            <button onClick={()=>ph(SK.week,1,setWeekNum)} style={{background:T.grad,color:"#fff",border:"none",borderRadius:12,padding:"10px 18px",fontSize:13,fontWeight:700,cursor:"pointer",boxShadow:T.glowSm,whiteSpace:"nowrap"}}>↺ Reset</button>
           </div>
         </div>
-        ${sparklineSVG(h)}
-      </div>
-      ${history_chips}
-    </div>`;
-  }).join("");
-
-  return `<div class="page">
-    <div class="page-header">
-      <div class="big-title">Progress 📈</div>
-      <div class="subtitle">Top set history per exercise</div>
-    </div>
-    <div class="section-label">12-Month Benchmarks</div>
-    ${benchCards}
-    <div class="section-label" style="margin-top:20px">Exercise History</div>
-    ${exCards}
-  </div>`;
-}
-
-function renderNutrition() {
-  const nd = nutDone(), allNutDone = nd === 3;
-  const eveningBanner = isEvening() && !allNutDone
-    ? `<div class="card card-yellow" style="margin-bottom:16px;display:flex;gap:10px;align-items:flex-start">
-        <span style="font-size:20px">🌙</span>
+      ) : (
         <div>
-          <div style="font-size:13px;font-weight:700;color:#92400e">Evening reminder</div>
-          <div style="font-size:12px;color:#92400e;margin-top:2px">You still have ${3-nd} non-negotiable${3-nd>1?"s":""} to tick off before bed.</div>
-        </div>
-      </div>` : "";
+      {/* Day cards */}
+      <SectionLabel>This Week's Sessions</SectionLabel>
+      {Object.entries(DAYS).map(([key,day])=>{
+        const done=completed[key];
+        return (
+          <div key={key} onClick={()=>{setActiveDay(key);setView("session");}}
+            style={{background:done?"#f8f8f8":"#fff",border:`1.5px solid ${done?"#e5e5e5":"#e0f7f4"}`,borderRadius:18,padding:"16px 18px",marginBottom:12,cursor:"pointer",boxShadow:done?"none":"0 2px 12px rgba(14,184,160,0.07)"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <div>
+                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:2}}>
+                  <span style={{fontSize:16,fontWeight:800,color:T.dark}}>{day.label}</span>
+                  {key==="C"&&<span style={{fontSize:10,background:"#f0f0f0",borderRadius:6,padding:"2px 7px",fontWeight:600,color:"#888"}}>OPTIONAL</span>}
+                  {done&&<span style={{fontSize:12}}>✅</span>}
+                  {isDeload&&<span style={{fontSize:10,background:"#fff3cd",borderRadius:6,padding:"2px 7px",fontWeight:600,color:"#92400e"}}>🔄 DELOAD</span>}
+                </div>
+                <div style={{fontSize:13,color:"#888"}}>{day.subtitle}</div>
+              </div>
+              <div style={{width:28,height:28,borderRadius:"50%",background:T.gradSubtle,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,color:T.teal,border:`1.5px solid rgba(14,184,160,0.2)`}}>›</div>
+            </div>
+            <div style={{marginTop:10,display:"flex",flexWrap:"wrap",gap:6}}>
+              {day.exercises.slice(0,3).map(ex=>{
+                const pre=getPreFill(ex.id);
+                return <div key={ex.id} style={{background:T.gradSubtle,borderRadius:8,padding:"4px 10px",fontSize:12,color:T.accent,border:"1px solid rgba(14,184,160,0.15)"}}>{ex.name.split(" ").slice(0,2).join(" ")} · {ex.unit==="BW"?`BW×${pre.r}`:`${pre.w}kg`}</div>;
+              })}
+              {day.exercises.length>3&&<div style={{background:"#f4f4f4",borderRadius:8,padding:"4px 10px",fontSize:12,color:"#aaa"}}>+{day.exercises.length-3} more</div>}
+            </div>
+          </div>
+        );
+      })}
 
-  const stallBanner = weightStalled()
-    ? `<div class="card card-red" style="margin-bottom:16px;display:flex;gap:10px;align-items:flex-start">
-        <span style="font-size:20px">⚠️</span>
-        <div>
-          <div style="font-size:13px;font-weight:700;color:#991b1b">Weight stall detected</div>
-          <div style="font-size:12px;color:#991b1b;margin-top:2px">No meaningful gain across your last 4 weigh-ins. Per your plan: add ~150 calories daily.</div>
-        </div>
-      </div>` : "";
+      </div>
+      )}
 
-  const nutCards = NONNEG.map(n => {
-    const done = state.nutChecks[n.id];
-    return `<div onclick="toggleNut('${n.id}')" style="background:${done?"#f0fff4":"#fff"};border:1.5px solid ${done?"#86efac":"#e5e5e5"};border-radius:16px;padding:16px 18px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;justify-content:space-between">
-      <div style="display:flex;align-items:center;gap:14px">
-        <div class="nut-icon-wrap" style="background:${done?"#f0fff4":"#f8f8f8"};border:2px solid ${done?n.colour:"#eee"}">${n.emoji}</div>
-        <div>
-          <div style="font-size:15px;font-weight:700">${n.label}</div>
-          <div style="font-size:13px;color:#888;margin-top:2px">${n.target}</div>
+      {/* Bodyweight */}
+      <div style={{background:"#f8f8f8",borderRadius:18,padding:"16px 18px"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+          <div><div style={{fontSize:14,fontWeight:700,color:T.dark}}>Bodyweight</div><div style={{fontSize:12,color:"#888"}}>Target: +0.1–0.2kg/month</div></div>
+          <div style={{fontSize:22,fontWeight:800,color:T.dark}}>{bodyweight[bodyweight.length-1]}kg</div>
+        </div>
+        <Sparkline data={bodyweight.map(w=>({w,r:w}))}/>
+        <div style={{display:"flex",gap:8,marginTop:12}}>
+          <input value={bwInput} onChange={e=>setBwInput(e.target.value)} placeholder="Log today's weight" type="number"
+            style={{flex:1,border:`1.5px solid #e5e5e5`,borderRadius:10,padding:"10px 12px",fontSize:14,outline:"none",fontFamily:"inherit"}}
+            onFocus={e=>e.target.style.borderColor=T.teal} onBlur={e=>e.target.style.borderColor="#e5e5e5"}/>
+          <button onClick={()=>{if(bwInput){ph(SK.bw,[...bodyweight,parseFloat(bwInput)],setBodyweight);setBwInput("");}}}
+            style={{background:T.grad,color:"#fff",border:"none",borderRadius:10,padding:"10px 16px",fontSize:14,fontWeight:700,cursor:"pointer",boxShadow:T.glowSm}}>Log</button>
         </div>
       </div>
-      <div class="check-circle" style="background:${done?"#22c55e":"#f0f0f0"}">${done?"✓":""}</div>
-    </div>`;
-  }).join("");
-
-  const celebLine = allNutDone
-    ? `<div style="background:#f0fff4;border-radius:14px;padding:12px 16px;margin-bottom:20px;text-align:center;font-size:14px;font-weight:700;color:#16a34a">🎉 All non-negotiables done today!</div>` : "";
-
-  const mealCards = MEALS.map(meal => {
-    const done = state.mealChecks[meal.id];
-    return `<div onclick="toggleMeal('${meal.id}')" style="background:${done?"#f8f8f8":"#fff"};border:1.5px solid #eee;border-radius:14px;padding:13px 16px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:14px">
-      <span style="font-size:22px;opacity:${done?0.5:1}">${meal.emoji}</span>
-      <div style="flex:1">
-        <div style="font-size:14px;font-weight:700;text-decoration:${done?"line-through":"none"};color:${done?"#aaa":"#1a1a1a"}">${meal.label}</div>
-        <div style="font-size:12px;color:#aaa;margin-top:2px">${meal.desc}</div>
-      </div>
-      <div class="check-circle" style="background:${done?"#22c55e":"#f0f0f0"}">${done?"✓":""}</div>
-    </div>`;
-  }).join("");
-
-  const guideRows = [
-    {label:"Target gain", value:"0.1–0.2 kg/month", color:"#22c55e"},
-    {label:"No gain after 4 weeks?", value:"Add ~150 cal/day", color:"#f59e0b"},
-    {label:"Gaining >0.3 kg/month?", value:"Reduce slightly", color:"#ef4444"}
-  ].map((row,i) => `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:${i<2?"1px solid #eee":"none"}">
-    <div style="font-size:13px;color:#555">${row.label}</div>
-    <div style="font-size:13px;font-weight:700;color:${row.color}">${row.value}</div>
-  </div>`).join("");
-
-  return `<div class="page">
-    <div class="page-header">
-      <div class="big-title">Nutrition 🥗</div>
-      <div class="subtitle">Today's non-negotiables</div>
     </div>
-    ${eveningBanner}
-    ${stallBanner}
-    <div class="section-label">Non-Negotiables</div>
-    ${nutCards}
-    ${celebLine}
-    <div class="section-label" style="margin-top:8px">Meal Timing</div>
-    ${mealCards}
-    <div class="card card-gray" style="margin-top:8px">
-      <div style="font-size:13px;font-weight:700;margin-bottom:10px">⚖️ Weight Gain Guide</div>
-      ${guideRows}
-    </div>
-  </div>`;
-}
+  );
 
-function renderLogSheet() {
-  if (!state.logSheet) return "";
-  const {dayKey, exIdx} = state.logSheet;
-  const ex = DAYS[dayKey].exercises[exIdx];
-  const log = state.sessionLogs[ex.id] || {w:0,r:0};
-  const last = getLastLog(ex.id);
-  const isBW = ex.unit === "BW";
+  // ── SESSION ───────────────────────────────────────────────────────────────
 
-  const weightRow = !isBW ? `<div style="margin-top:18px;margin-bottom:20px">
-    <div style="font-size:12px;color:#666;font-weight:600;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px">Weight (kg)</div>
-    <div class="stepper-row">
-      <button class="btn btn-light" onclick="adjLog('w',-1)">−1</button>
-      <div class="stepper-val">${log.w}</div>
-      <button class="btn btn-dark" onclick="adjLog('w',1)">+1</button>
-    </div>
-  </div>` : "";
-
-  const deloadNote = isDeload() ? `<div style="background:#fff8e6;border:1px solid #f59e0b;border-radius:10px;padding:8px 12px;margin-top:10px;font-size:12px;color:#92400e">🔄 Deload — weight auto-set to 80%. Cut sets in half.</div>` : "";
-
-  return `<div class="sheet-overlay" onclick="if(event.target===this)closeLog()">
-    <div class="sheet">
-      <div class="sheet-handle"></div>
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
-        <div>
-          <div style="font-size:18px;font-weight:700">${ex.name}</div>
-          <div style="font-size:13px;color:#888;margin-top:2px">${ex.range} · Last: ${isBW?`BW×${last.r}`:`${last.w}kg×${last.r}`}${isDeload()?'<span style="color:#f59e0b;font-weight:700"> · 🔄 80%</span>':""}</div>
+  const SessionView = () => {
+    if(!activeDay) return null;
+    const day=DAYS[activeDay];
+    const loggedCount=day.exercises.filter(ex=>sessionLogs[ex.id]).length;
+    const progress=loggedCount/day.exercises.length;
+    return (
+      <div style={{padding:"0 20px 100px"}}>
+        <div style={{paddingTop:56,marginBottom:20}}>
+          <button onClick={()=>setView("home")} style={{background:"none",border:"none",fontSize:14,color:T.accent,cursor:"pointer",padding:0,marginBottom:12,fontWeight:600}}>← Back</button>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <div style={{fontSize:24,fontWeight:800,color:T.dark}}>{day.label}</div>
+            {isDeload&&<span style={{fontSize:11,background:"#fff3cd",borderRadius:8,padding:"3px 9px",fontWeight:700,color:"#92400e"}}>🔄 Deload</span>}
+          </div>
+          <div style={{fontSize:14,color:"#888"}}>{day.subtitle}</div>
+          <div style={{marginTop:12,background:"#f0f0f0",borderRadius:99,height:6}}>
+            <div style={{width:`${progress*100}%`,height:"100%",background:T.grad,borderRadius:99,transition:"width 0.3s",boxShadow:progress>0?T.glowSm:""}}/>
+          </div>
+          <div style={{fontSize:12,color:T.accent,marginTop:6,fontWeight:600}}>{loggedCount} / {day.exercises.length} logged</div>
         </div>
-        <button onclick="openTipsFromLog()" style="background:#f4f4f4;border:none;border-radius:10px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;color:#555;font-family:inherit">💡 Tips</button>
+
+        {shoulderFlag&&(activeDay==="A"||activeDay==="B")&&(
+          <div style={{background:"#fff3cd",borderRadius:14,padding:"12px 16px",marginBottom:14,fontSize:13,color:"#92400e"}}>⚠️ Shoulder fatigue — reduce pressing sets by 1 today</div>
+        )}
+
+        {day.exercises.map((ex,i)=>{
+          const entry=sessionLogs[ex.id], pre=getPreFill(ex.id), last=getLastLog(ex.id), isBW=ex.unit==="BW";
+          const improved=entry&&(Number(entry.r)>last.r||Number(entry.w)>last.w);
+          return (
+            <div key={ex.id} style={{background:entry?T.gradSubtle:"#fff",border:`1.5px solid ${entry?"rgba(14,184,160,0.35)":"#eee"}`,borderRadius:16,padding:"14px 16px",marginBottom:10,boxShadow:entry?T.glowSm:""}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <div style={{flex:1}} onClick={()=>openLog(activeDay,i)}>
+                  <div style={{fontSize:15,fontWeight:700,color:T.dark}}>{ex.name}</div>
+                  <div style={{fontSize:12,color:"#888",marginTop:2}}>{ex.range}</div>
+                  {entry
+                    ?<div style={{fontSize:13,color:T.teal,fontWeight:700,marginTop:4}}>{isBW?`BW × ${entry.r} reps`:`${entry.w}kg × ${entry.r} reps`}{improved&&" 🔥"}</div>
+                    :<div style={{fontSize:12,color:"#bbb",marginTop:4}}>Pre-filled: {isBW?`BW×${pre.r}`:`${pre.w}kg×${pre.r}`}{isDeload?" (80%)":""}</div>
+                  }
+                </div>
+                <div style={{display:"flex",alignItems:"center",gap:8}}>
+                  <button onClick={()=>setTipsSheet(ex)} style={{background:T.gradSubtle,border:`1px solid rgba(14,184,160,0.2)`,borderRadius:10,width:34,height:34,fontSize:15,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>💡</button>
+                  <div onClick={()=>openLog(activeDay,i)} style={{width:32,height:32,borderRadius:"50%",background:entry?T.grad:"#f0f0f0",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:14,color:entry?"#fff":"#ccc",boxShadow:entry?T.glowSm:"",fontWeight:800}}>{entry?"✓":"+"}</div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+
+        {day.core.length>0&&(
+          <div style={{background:"#f8f8f8",borderRadius:16,padding:"14px 16px",marginBottom:16}}>
+            <SectionLabel style={{marginBottom:8}}>Core</SectionLabel>
+            {day.core.map((c,i)=><div key={i} style={{fontSize:13,color:"#555",marginBottom:4}}>• {c}</div>)}
+          </div>
+        )}
+
+        <button onClick={()=>finishSession(activeDay)} style={{width:"100%",background:T.grad,color:"#fff",border:"none",borderRadius:16,padding:"18px",fontSize:16,fontWeight:800,cursor:"pointer",boxShadow:T.glow}}>
+          Finish Session ✓
+        </button>
       </div>
-      ${deloadNote}
-      ${weightRow}
-      <div style="margin-bottom:28px">
-        <div style="font-size:12px;color:#666;font-weight:600;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px">Top Set Reps</div>
-        <div class="stepper-row">
-          <button class="btn btn-light" onclick="adjLog('r',-1)">−1</button>
-          <div class="stepper-val">${log.r}</div>
-          <button class="btn btn-dark" onclick="adjLog('r',1)">+1</button>
+    );
+  };
+
+  // ── PROGRESS ──────────────────────────────────────────────────────────────
+
+  const ProgressView = () => (
+    <div style={{padding:"0 20px 100px"}}>
+      <div style={{paddingTop:56,marginBottom:24}}>
+        <div style={{fontSize:26,fontWeight:800,color:T.dark}}>Progress 📈</div>
+        <div style={{fontSize:14,color:"#888"}}>Top set history per exercise</div>
+      </div>
+      <SectionLabel>12-Month Benchmarks</SectionLabel>
+      {Object.entries(BENCHMARKS).map(([id,b])=>{
+        const h=history[id]||[], current=h.length?(b.unit==="reps"?h[h.length-1].r:h[h.length-1].w):b.start;
+        const pct=Math.round(Math.max(0,((current-b.start)/(b.target-b.start))*100));
+        return (
+          <div key={id} style={{background:"#f8f8f8",borderRadius:16,padding:"14px 16px",marginBottom:10}}>
+            <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
+              <div style={{fontSize:14,fontWeight:700,color:T.dark}}>{b.label}</div>
+              <div style={{fontSize:13,fontWeight:800,color:T.teal}}>{current} <span style={{color:"#aaa",fontWeight:400}}>/ {b.target} {b.unit}</span></div>
+            </div>
+            <PBar value={current-b.start} max={b.target-b.start} gradient/>
+            <div style={{fontSize:11,color:T.accent,marginTop:6,fontWeight:600}}>{pct}% to goal</div>
+          </div>
+        );
+      })}
+      <SectionLabel style={{marginTop:20}}>Exercise History</SectionLabel>
+      {allEx.map(ex=>{
+        const h=history[ex.id]; if(!h||h.length<2) return null;
+        const recent=h.slice(-7);
+        const latest=recent[recent.length-1], first=recent[0], up=ex.unit==="BW"?latest.r>first.r:latest.w>first.w||latest.r>first.r;
+        return (
+          <div key={ex.id} onClick={()=>setChartEx(chartEx===ex.id?null:ex.id)}
+            style={{background:"#fff",border:"1.5px solid #eee",borderRadius:16,padding:"14px 16px",marginBottom:10,cursor:"pointer"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <div>
+                <div style={{fontSize:14,fontWeight:700,color:T.dark}}>{ex.name}</div>
+                <div style={{fontSize:12,color:up?T.teal:"#888",marginTop:2,fontWeight:up?700:400}}>
+                  {ex.unit==="BW"?`BW×${latest.r} reps`:`${latest.w}kg × ${latest.r} reps`} {up?"↑":""}
+                </div>
+              </div>
+              <Sparkline data={h}/>
+            </div>
+            {chartEx===ex.id&&(
+              <div style={{marginTop:12,display:"flex",gap:6,flexWrap:"wrap"}}>
+                {h.map((e,i)=><div key={i} style={{background:T.gradSubtle,borderRadius:8,padding:"4px 10px",fontSize:12,color:T.accent,border:"1px solid rgba(14,184,160,0.15)"}}>#{i+1}: {ex.unit==="BW"?`BW×${e.r}`:`${e.w}kg×${e.r}`}</div>)}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  // ── NUTRITION ─────────────────────────────────────────────────────────────
+
+  const NutritionView = () => {
+    const allNutDone=nutDone===3;
+    return (
+      <div style={{padding:"0 20px 100px"}}>
+        <div style={{paddingTop:56,marginBottom:24}}>
+          <div style={{fontSize:26,fontWeight:800,color:T.dark}}>Nutrition 🥗</div>
+          <div style={{fontSize:14,color:"#888"}}>Today's non-negotiables</div>
+        </div>
+
+        {isEvening&&!allNutDone&&(
+          <div style={{background:"#fff3cd",border:"1px solid #f59e0b",borderRadius:16,padding:"14px 16px",marginBottom:16,display:"flex",gap:10,alignItems:"flex-start"}}>
+            <span style={{fontSize:20}}>🌙</span>
+            <div>
+              <div style={{fontSize:13,fontWeight:700,color:"#92400e"}}>Evening reminder</div>
+              <div style={{fontSize:12,color:"#92400e",marginTop:2}}>You still have {3-nutDone} non-negotiable{3-nutDone>1?"s":""} to tick off before bed.</div>
+            </div>
+          </div>
+        )}
+
+        {weightStalled&&(
+          <div style={{background:"#fef2f2",border:"1px solid #fca5a5",borderRadius:16,padding:"14px 16px",marginBottom:16,display:"flex",gap:10,alignItems:"flex-start"}}>
+            <span style={{fontSize:20}}>⚠️</span>
+            <div>
+              <div style={{fontSize:13,fontWeight:700,color:"#991b1b"}}>Weight stall detected</div>
+              <div style={{fontSize:12,color:"#991b1b",marginTop:2}}>No meaningful gain across your last 4 weigh-ins. Per your plan: add ~150 calories daily.</div>
+            </div>
+          </div>
+        )}
+
+        <SectionLabel>Non-Negotiables</SectionLabel>
+        {NONNEG.map(n=>{
+          const done=nutChecks[n.id];
+          return (
+            <div key={n.id} onClick={()=>{const u={...nutChecks,[n.id]:!done};ph(SK.nutChecks,u,setNutChecks);}}
+              style={{background:done?T.gradSubtle:"#fff",border:`1.5px solid ${done?"rgba(14,184,160,0.3)":"#eee"}`,borderRadius:16,padding:"16px 18px",marginBottom:10,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between",boxShadow:done?T.glowSm:""}}>
+              <div style={{display:"flex",alignItems:"center",gap:14}}>
+                <div style={{width:44,height:44,borderRadius:14,background:done?T.gradSubtle:"#f8f8f8",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,border:`2px solid ${done?T.teal:"#eee"}`}}>{n.emoji}</div>
+                <div>
+                  <div style={{fontSize:15,fontWeight:700,color:T.dark}}>{n.label}</div>
+                  <div style={{fontSize:13,color:"#888",marginTop:2}}>{n.target}</div>
+                </div>
+              </div>
+              <div style={{width:28,height:28,borderRadius:"50%",background:done?T.grad:"#f0f0f0",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,color:"#fff",boxShadow:done?T.glowSm:""}}>{done?"✓":""}</div>
+            </div>
+          );
+        })}
+
+        {allNutDone&&<div style={{background:T.gradSubtle,border:`1px solid rgba(14,184,160,0.25)`,borderRadius:14,padding:"12px 16px",marginBottom:20,textAlign:"center",fontSize:14,fontWeight:700,color:T.teal}}>🎉 All non-negotiables done today!</div>}
+
+        <SectionLabel style={{marginTop:8}}>Meal Timing</SectionLabel>
+        {MEALS.map(meal=>{
+          const done=mealChecks[meal.id];
+          return (
+            <div key={meal.id} onClick={()=>{const u={...mealChecks,[meal.id]:!done};ph(SK.mealChecks,u,setMealChecks);}}
+              style={{background:done?"#f8f8f8":"#fff",border:"1.5px solid #eee",borderRadius:14,padding:"13px 16px",marginBottom:8,cursor:"pointer",display:"flex",alignItems:"center",gap:14}}>
+              <span style={{fontSize:22,opacity:done?0.5:1}}>{meal.emoji}</span>
+              <div style={{flex:1}}>
+                <div style={{fontSize:14,fontWeight:700,textDecoration:done?"line-through":"none",color:done?"#aaa":T.dark}}>{meal.label}</div>
+                <div style={{fontSize:12,color:"#aaa",marginTop:2}}>{meal.desc}</div>
+              </div>
+              <div style={{width:26,height:26,borderRadius:"50%",background:done?T.grad:"#f0f0f0",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,color:"#fff",boxShadow:done?T.glowSm:""}}>{done?"✓":""}</div>
+            </div>
+          );
+        })}
+
+        <div style={{background:"#f8f8f8",borderRadius:18,padding:"16px 18px",marginTop:8}}>
+          <div style={{fontSize:13,fontWeight:700,color:T.dark,marginBottom:10}}>⚖️ Weight Gain Guide</div>
+          {[{label:"Target gain",value:"0.1–0.2 kg/month",color:T.teal},{label:"No gain after 4 weeks?",value:"Add ~150 cal/day",color:"#f59e0b"},{label:"Gaining >0.3 kg/month?",value:"Reduce slightly",color:"#ef4444"}].map((row,i)=>(
+            <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 0",borderBottom:i<2?"1px solid #eee":"none"}}>
+              <div style={{fontSize:13,color:"#555"}}>{row.label}</div>
+              <div style={{fontSize:13,fontWeight:700,color:row.color}}>{row.value}</div>
+            </div>
+          ))}
         </div>
       </div>
-      <button class="btn btn-dark btn-full" onclick="saveLog()">Log Top Set ✓</button>
-      <button class="btn-ghost" onclick="closeLog()">Cancel</button>
-    </div>
-  </div>`;
-}
+    );
+  };
 
-function renderTipsSheet() {
-  if (!state.tipsSheet) return "";
-  const ex = state.tipsSheet;
-  const tips = ex.tips.map((tip,i) => `<div style="display:flex;gap:12px;margin-bottom:14px;align-items:flex-start">
-    <div class="tip-num">${i+1}</div>
-    <div style="font-size:14px;color:#333;line-height:1.5">${tip}</div>
-  </div>`).join("");
+  // ── TAB BAR ───────────────────────────────────────────────────────────────
 
-  return `<div class="sheet-overlay" onclick="if(event.target===this)closeTips()">
-    <div class="sheet">
-      <div class="sheet-handle"></div>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
-        <span style="font-size:22px">💡</span>
-        <div>
-          <div style="font-size:17px;font-weight:800">${ex.name}</div>
-          <div style="font-size:12px;color:#888">Form & technique tips</div>
-        </div>
-      </div>
-      ${tips}
-      <button class="btn btn-dark btn-full" style="margin-top:8px" onclick="closeTips()">Got it ✓</button>
-    </div>
-  </div>`;
-}
-
-function renderTabBar() {
   const tabs = [
-    {key:"home", icon:"🏠", label:"Home"},
-    {key:"nutrition", icon:"🥗", label:"Nutrition", badge: nutDone()<3 && isEvening()},
-    {key:"progress", icon:"📈", label:"Progress"}
+    {key:"home",icon:"🏠",label:"Home"},
+    {key:"nutrition",icon:"🥗",label:"Nutrition",badge:nutDone<3&&isEvening},
+    {key:"progress",icon:"📈",label:"Progress"},
   ];
-  return `<div class="tab-bar">
-    ${tabs.map(t => `<button class="tab-btn" onclick="setView('${t.key}')">
-      <span style="font-size:20px">${t.icon}</span>
-      ${t.badge?'<div class="tab-badge"></div>':""}
-      <span style="font-size:11px;font-weight:${state.view===t.key?700:400};color:${state.view===t.key?"#1a1a1a":"#aaa"}">${t.label}</span>
-    </button>`).join("")}
-  </div>`;
+
+  return (
+    <div style={{fontFamily:"-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif",background:"#fff",minHeight:"100vh",maxWidth:430,margin:"0 auto",position:"relative"}}>
+      {view==="home"&&<HomeView/>}
+      {view==="session"&&<SessionView/>}
+      {view==="nutrition"&&<NutritionView/>}
+      {view==="progress"&&<ProgressView/>}
+      <LogSheet/>
+      <TipsSheet/>
+
+      {/* Tab bar — clean white */}
+      <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:430,background:"rgba(255,255,255,0.95)",backdropFilter:"blur(12px)",borderTop:"1px solid #eee",display:"flex",padding:"10px 0 24px"}}>
+        {tabs.map(tab=>(
+          <button key={tab.key} onClick={()=>{setView(tab.key);setActiveDay(null);}}
+            style={{flex:1,background:"none",border:"none",cursor:"pointer",padding:"6px 0",display:"flex",flexDirection:"column",alignItems:"center",gap:2,position:"relative"}}>
+            <span style={{fontSize:20}}>{tab.icon}</span>
+            {tab.badge&&<div style={{position:"absolute",top:4,right:"calc(50% - 18px)",width:8,height:8,borderRadius:"50%",background:T.teal}}/>}
+            <span style={{fontSize:11,fontWeight:view===tab.key?700:400,color:view===tab.key?T.dark:"#aaa"}}>{tab.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 }
-
-// ── RENDER ────────────────────────────────────────────────────────────────────
-
-function render() {
-  let content = "";
-  if (state.view==="home") content = renderHome();
-  else if (state.view==="session") content = renderSession();
-  else if (state.view==="progress") content = renderProgress();
-  else if (state.view==="nutrition") content = renderNutrition();
-
-  document.getElementById("app").innerHTML =
-    content + renderTabBar() + renderLogSheet() + renderTipsSheet();
-
-  // re-attach shoulder toggle (event delegation would be cleaner but this is safe here)
-  const st = document.getElementById("shoulder-toggle");
-  if (st) st.addEventListener("click", () => {
-    const s = !state.shoulderFlag;
-    persist(SK.shoulder, s);
-    setState({shoulderFlag: s});
-  });
-}
-
-// ── ACTIONS ───────────────────────────────────────────────────────────────────
-
-function setView(v) { setState({view:v, activeDay: v!=="session" ? null : state.activeDay}); }
-
-function setWeek(w) { persist(SK.week, w); setState({weekNum:w}); }
-
-function openDay(key) { setState({view:"session", activeDay:key}); }
-
-function finishSession(key) {
-  const c = {...state.completed, [key]:true};
-  persist(SK.completed, c);
-  setState({completed:c, view:"home", activeDay:null});
-}
-
-function openLog(dayKey, exIdx) {
-  const ex = DAYS[dayKey].exercises[exIdx];
-  const pre = getPreFill(ex.id);
-  const logs = {...state.sessionLogs};
-  if (!logs[ex.id]) logs[ex.id] = {w:pre.w, r:pre.r};
-  setState({logSheet:{dayKey,exIdx}, sessionLogs:logs});
-}
-
-function closeLog() { setState({logSheet:null}); }
-
-function adjLog(field, delta) {
-  const {dayKey, exIdx} = state.logSheet;
-  const ex = DAYS[dayKey].exercises[exIdx];
-  const logs = {...state.sessionLogs};
-  const cur = logs[ex.id] || {w:0,r:0};
-  logs[ex.id] = {...cur, [field]: Math.max(0, Number(cur[field]||0)+delta)};
-  setState({sessionLogs:logs});
-}
-
-function saveLog() {
-  const {dayKey, exIdx} = state.logSheet;
-  const ex = DAYS[dayKey].exercises[exIdx];
-  const entry = state.sessionLogs[ex.id];
-  if (entry) {
-    const h = {...state.history, [ex.id]: [...(state.history[ex.id]||[]), {w:Number(entry.w),r:Number(entry.r)}]};
-    persist(SK.history, h);
-    setState({history:h, logSheet:null});
-  } else {
-    setState({logSheet:null});
-  }
-}
-
-function openTips(ex) { setState({tipsSheet:ex}); }
-
-function openTipsFromLog() {
-  const {dayKey, exIdx} = state.logSheet;
-  const ex = DAYS[dayKey].exercises[exIdx];
-  setState({logSheet:null, tipsSheet:ex});
-}
-
-function closeTips() { setState({tipsSheet:null}); }
-
-function toggleChart(id) { setState({chartEx: state.chartEx===id ? null : id}); }
-
-function logBW() {
-  const v = parseFloat(document.getElementById("bw-input")?.value || state.bwInput);
-  if (!isNaN(v) && v > 0) {
-    const bw = [...state.bodyweight, v];
-    persist(SK.bw, bw);
-    setState({bodyweight:bw, bwInput:""});
-  }
-}
-
-function toggleNut(id) {
-  const nc = {...state.nutChecks, [id]:!state.nutChecks[id]};
-  persist(SK.nutChecks, nc);
-  setState({nutChecks:nc});
-}
-
-function toggleMeal(id) {
-  const mc = {...state.mealChecks, [id]:!state.mealChecks[id]};
-  persist(SK.mealChecks, mc);
-  setState({mealChecks:mc});
-}
-
-// ── BOOT ──────────────────────────────────────────────────────────────────────
-render();
-</script>
-</body>
-</html>
