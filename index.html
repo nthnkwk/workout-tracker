@@ -77,6 +77,7 @@ const SK = {
   history:"wt_history", week:"wt_week", shoulder:"wt_shoulder",
   bw:"wt_bw", completed:"wt_completed",
   nutDate:"wt_nut_date", nutChecks:"wt_nut_checks", mealChecks:"wt_meal_checks",
+  lastAutoWeek:"wt_last_auto_week",
 };
 
 async function load(key, fallback) {
@@ -177,14 +178,27 @@ export default function App() {
 
   useEffect(()=>{
     (async()=>{
-      const [h,w,s,bw,c,nd,nc,mc] = await Promise.all([
-        load(SK.history,DEFAULT_HISTORY), load(SK.week,3), load(SK.shoulder,false),
+      const [h,w,s,bw,c,nd,nc,mc,law] = await Promise.all([
+        load(SK.history,DEFAULT_HISTORY), load(SK.week,1), load(SK.shoulder,false),
         load(SK.bw,[70.8,71.0,71.1]), load(SK.completed,{A:false,B:false,C:false}),
         load(SK.nutDate,todayStr()), load(SK.nutChecks,{protein:false,creatine:false,water:false}),
-        load(SK.mealChecks,{}),
+        load(SK.mealChecks,{}), load(SK.lastAutoWeek, null),
       ]);
-      const today=todayStr();
-      setHistory(h); setWeekNum(w); setShoulderFlag(s); setBodyweight(bw); setCompleted(c);
+      const today = todayStr();
+      const now = new Date();
+      // Auto-advance week at 12:01am every Sunday (day=0)
+      const isSunday = now.getDay() === 0;
+      const pastMidnight = now.getHours() === 0 && now.getMinutes() >= 1;
+      const thisSundayStr = today;
+      let resolvedWeek = w;
+      if (isSunday && pastMidnight && law !== thisSundayStr && w < 7) {
+        resolvedWeek = w + 1;
+        save(SK.week, resolvedWeek);
+        save(SK.lastAutoWeek, thisSundayStr);
+        save(SK.completed, {A:false,B:false,C:false});
+      }
+      setHistory(h); setWeekNum(resolvedWeek); setShoulderFlag(s); setBodyweight(bw);
+      setCompleted(law !== thisSundayStr && isSunday && pastMidnight ? {A:false,B:false,C:false} : c);
       if(nd!==today){
         setNutChecks({protein:false,creatine:false,water:false}); setMealChecks({});
         save(SK.nutDate,today); save(SK.nutChecks,{protein:false,creatine:false,water:false}); save(SK.mealChecks,{});
